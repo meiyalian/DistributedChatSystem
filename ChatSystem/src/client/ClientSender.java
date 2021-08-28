@@ -6,18 +6,18 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-class ClientSideConnection {
+class ClientSender {
     private Socket socket;
     private PrintWriter writer;
     private BufferedReader userInput;
     private BufferedReader reader;
     private boolean connection_alive;
-    public static final int PORT = 6379;
 
-    public ClientSideConnection() throws IOException {
+
+    public ClientSender(Socket soc) throws IOException {
         System.out.println("Client started");
         // Client must know the hostname or IP of teh machine and on which the server is running
-        this.socket = new Socket("localhost", PORT);
+        this.socket = soc;
         this.userInput = new BufferedReader(new InputStreamReader(System.in));
         // autoFlush = true means send the data immediately when receiving the input
         this.writer = new PrintWriter(this.socket.getOutputStream(), true);
@@ -25,9 +25,6 @@ class ClientSideConnection {
     }
 
     public void close() throws IOException {
-        this.userInput.close();
-        this.reader.close();
-        this.writer.close();
         this.socket.close();
         System.out.println("Connection closed.");
     }

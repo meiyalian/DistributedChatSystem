@@ -1,9 +1,16 @@
 package client;
 
 import java.io.IOException;
+import java.net.Socket;
 
 public class ChatClient {
+    private Socket socket;
     private String identity = "";
+    public static final int PORT = 6379;
+
+    public ChatClient() throws IOException {
+        this.socket = new Socket("localhost", PORT);
+    }
 
     public void setIdentity(String identity) {
         this.identity = identity;
@@ -14,8 +21,8 @@ public class ChatClient {
     }
 
     public void handle() throws IOException {
-        ClientSideConnection clientSideConnection = new ClientSideConnection();
-        clientSideConnection.run();
+        ClientSender clientSender = new ClientSender(socket);
+        clientSender.run();
     }
 
     public static void main(String[] args){
