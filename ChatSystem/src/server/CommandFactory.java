@@ -12,34 +12,33 @@ public class CommandFactory {
     }
 
     public Command convertJsonToCommand(String jsonMessage){
-        JsonObject jsonObject = gson.fromJson(jsonMessage, JsonObject.class);
-        String type = jsonObject.get("type").getAsString();
+        String type = gson.fromJson(jsonMessage, JsonObject.class).get("type").getAsString();
 
         switch(type){
             case "newidentity":
-                return new NewIdentityCommand();
+                return this.gson.fromJson(jsonMessage, NewIdentityCommand.class);
             case "identitychange":
-                return new IdentityChangeCommand();
+                return this.gson.fromJson(jsonMessage, IdentityChangeCommand.class);
             case "join":
-                return new JoinCommand();
+                return this.gson.fromJson(jsonMessage, JoinCommand.class);
             case "roomchange":
-                return new RoomChangeCommand();
+                return this.gson.fromJson(jsonMessage, RoomChangeCommand.class);
             case "roomcontents":
-                return new RoomContentsCommand();
+                return this.gson.fromJson(jsonMessage, RoomContentsCommand.class);
             case "who":
-                return new WhoCommand();
+                return this.gson.fromJson(jsonMessage, WhoCommand.class);
             case "roomlist":
-                return new RoomListCommand();
+                return this.gson.fromJson(jsonMessage, RoomListCommand.class);
             case "list":
-                return new ListCommand();
+                return this.gson.fromJson(jsonMessage, ListCommand.class);
             case "createroom":
-                return new CreateRoomCommand();
+                return this.gson.fromJson(jsonMessage, CreateRoomCommand.class);
             case "delete":
-                return new DeleteCommand();
+                return this.gson.fromJson(jsonMessage, DeleteCommand.class);
             case "message":
-                return new MessageCommand();
+                return this.gson.fromJson(jsonMessage, MessageCommand.class);
             case "quit":
-                return new QuitCommand();
+                return this.gson.fromJson(jsonMessage, QuitCommand.class);
             default:
                 return null;
         }

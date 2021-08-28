@@ -27,9 +27,9 @@ public class ChatServer {
             while (alive){
                 System.out.println("Wait for client connection request: ");
                 Socket soc = serverSocket.accept();
-                ChatConnection chatConnection = new ChatConnection(soc, chatManager, commandFactory);
-                chatConnection.start(); // connection is thread
-                chatManager.addClientConnection(chatConnection);
+                ServerSideConnection serverSideConnection = new ServerSideConnection(soc, chatManager, commandFactory);
+                serverSideConnection.start(); // connection is thread
+                chatManager.addClientConnection(serverSideConnection);
             }
         } catch (IOException e) {
             alive = false;

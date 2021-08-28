@@ -8,7 +8,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-public class ChatConnection extends Thread {
+public class ServerSideConnection extends Thread {
     private Socket socket;
     private ChatManager chatManager;
     private CommandFactory commandFactory;
@@ -16,7 +16,7 @@ public class ChatConnection extends Thread {
     private BufferedReader reader;
     private boolean connection_alive;
 
-    public ChatConnection(Socket socket, ChatManager chatManager, CommandFactory commandFactory) throws IOException {
+    public ServerSideConnection(Socket socket, ChatManager chatManager, CommandFactory commandFactory) throws IOException {
         this.socket = socket;
         this.chatManager = chatManager;
         this.commandFactory = commandFactory;
@@ -26,7 +26,7 @@ public class ChatConnection extends Thread {
 
     private void executeCommand(String jsonMessage){
         Command command = commandFactory.convertJsonToCommand(jsonMessage);
-        command.executeCommandOnServer(this);
+        command.execute(this);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class ChatConnection extends Thread {
         close();
     }
 
-    private void leave(ChatConnection connection) {
+    private void leave(ServerSideConnection connection) {
         chatManager.removeClientConnection(connection);
     }
 

@@ -2,21 +2,28 @@ package command;
 
 import client.ChatClient;
 import com.google.gson.Gson;
-import server.ChatConnection;
+import server.ServerSideConnection;
 
-public abstract class Command {
-    private String type;
+public class Command {
     private final Gson gson = new Gson();
 
-    public abstract void executeCommandOnServer(ChatConnection chatConnection);
+    /**
+     * The detailed implementation is left to the child class to implement
+     * @param serverSideConnection
+     */
+    public void execute(ServerSideConnection serverSideConnection){};
 
-    public abstract void executeCommandOnClient(ChatClient chatClient);
+    /**
+     * The detailed implementation is left to the child class to implement
+     * @param chatClient
+     */
+    public void execute(ChatClient chatClient){};
 
     private String convertObjectToJson(){
         return gson.toJson(this);
     }
 
-    public void sendJsonMessage(ChatConnection chatConnection){
-        chatConnection.sendMessage(this.convertObjectToJson());
+    public void sendJsonMessage(ServerSideConnection serverSideConnection){
+        serverSideConnection.sendMessage(this.convertObjectToJson());
     }
 }
