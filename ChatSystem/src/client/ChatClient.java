@@ -12,6 +12,10 @@ public class ChatClient {
         this.socket = new Socket("localhost", PORT);
     }
 
+    public Socket getSocket(){
+        return this.socket;
+    }
+
     public void setIdentity(String identity) {
         this.identity = identity;
     }

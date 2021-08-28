@@ -9,7 +9,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import com.google.gson.Gson;
 
-class ClientSender {
+class ClientSender extends Thread{
     private Socket socket;
     private PrintWriter writer;
     private BufferedReader userInput;
@@ -37,14 +37,26 @@ class ClientSender {
         System.out.println("Connection closed.");
     }
 
-    public void run() throws IOException {
+    public void run() {
         connection_alive = true;
         while (connection_alive) {
-            String str = userInput.readLine();
-            Command command = commandFactory.convertUserInputToCommand(str);
-            String jsonMessage = gson.toJson(command);
-            this.writer.println(jsonMessage);
+            try {
+                String str = userInput.readLine();
+                if (str != null){
+                    Command command = commandFactory.convertUserInputToCommand(str);
+                    String jsonMessage = gson.toJson(command);
+                    this.writer.println(jsonMessage);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                connection_alive = false;
+            }
         }
-        close();
+
+        try {
+            close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

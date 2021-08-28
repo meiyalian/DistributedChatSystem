@@ -6,7 +6,7 @@ import command.*;
 
 
 public class CommandFactory {
-    private Gson gson = new Gson();
+    private final Gson gson = new Gson();
 
     public Command convertUserInputToCommand(String userInput){
         String[] inputArray = userInput.split(" ");
