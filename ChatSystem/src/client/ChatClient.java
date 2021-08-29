@@ -24,16 +24,19 @@ public class ChatClient {
         return identity;
     }
 
-    public void handle() throws IOException {
-        ClientSender clientSender = new ClientSender(socket);
-        clientSender.start();
-    }
-
     public static void main(String[] args){
         try {
             new ChatClient().handle();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void handle() throws IOException {
+        ClientSender clientSender = new ClientSender(socket, this);
+        ClientReceiver clientReceiver = new ClientReceiver(this);
+
+        clientSender.start();
+        clientReceiver.start();
     }
 }

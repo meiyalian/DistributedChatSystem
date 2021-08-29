@@ -1,6 +1,6 @@
 package server;
 
-import command.Command;
+import server_command.ServerCommand;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,7 +28,7 @@ public class ServerConnection extends Thread {
     public ChatManager getChatManager(){return this.chatManager;}
 
     private void executeCommand(String jsonMessage){
-        Command command = commandFactory.convertClientMessageToCommand(jsonMessage);
+        ServerCommand command = commandFactory.convertClientMessageToCommand(jsonMessage);
         command.execute(this);
     }
 
@@ -65,4 +65,5 @@ public class ServerConnection extends Thread {
         this.writer.println(message);
         this.writer.flush();
     }
+
 }

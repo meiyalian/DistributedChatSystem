@@ -1,6 +1,6 @@
 package client;
 
-import command.Command;
+import client_command.ClientCommand;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,6 +15,7 @@ public class ClientReceiver extends Thread{
     private boolean connection_alive;
 
     public ClientReceiver(ChatClient chatClient) throws IOException {
+        this.chatClient = chatClient;
         this.socket = chatClient.getSocket();
         this.commandFactory = new CommandFactory();
         this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF8"));
@@ -26,14 +27,16 @@ public class ClientReceiver extends Thread{
         System.out.println("Warning: Client receiver connection closed.");
     }
 
-
+    /**
+     * Receives messages from server
+     */
     public void run(){
         this.connection_alive = true;
         while (connection_alive) {
             try {
                 String str = reader.readLine();
                 if (str != null){
-                    Command command = commandFactory.convertServerMessageToCommand(str);
+                    ClientCommand command = commandFactory.convertServerMessageToCommand(str);
                     if (command != null){
                         command.execute(chatClient);
                     }

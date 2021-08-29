@@ -1,8 +1,9 @@
 package client;
 
+import client_command.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import command.*;
+import server_command.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +31,7 @@ public class CommandFactory {
      * @param userInput
      * @return
      */
-    public Command convertUserInputToCommand(String userInput){
+    public ServerCommand convertUserInputToCommand(String userInput){
         String[] inputArray = userInput.split(" ");
         int inputLength = inputArray.length;
 
@@ -73,7 +74,7 @@ public class CommandFactory {
      * @param jsonMessage
      * @return
      */
-    public Command convertServerMessageToCommand(String jsonMessage){
+    public ClientCommand convertServerMessageToCommand(String jsonMessage){
         String type = gson.fromJson(jsonMessage, JsonObject.class).get("type").getAsString();
 
         switch(type){

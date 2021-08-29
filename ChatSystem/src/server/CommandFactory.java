@@ -2,7 +2,7 @@ package server;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import command.*;
+import server_command.*;
 
 public class CommandFactory {
     private final Gson gson;
@@ -16,7 +16,7 @@ public class CommandFactory {
      * @param jsonMessage
      * @return
      */
-    public Command convertClientMessageToCommand(String jsonMessage){
+    public ServerCommand convertClientMessageToCommand(String jsonMessage){
         String type = gson.fromJson(jsonMessage, JsonObject.class).get("type").getAsString();
 
         switch(type){

@@ -1,4 +1,4 @@
-package command;
+package client_command;
 
 import client.ChatClient;
 
@@ -7,7 +7,7 @@ import client.ChatClient;
  * Request message:
  * {"type": "newidentity", "former": "", "identity": "guest3"}
  */
-public class NewIdentityCommand extends Command{
+public class NewIdentityCommand extends ClientCommand {
     private String former;
     private String identity;
     private final String type = "newidentity";
@@ -20,6 +20,13 @@ public class NewIdentityCommand extends Command{
     @Override
     public void execute(ChatClient chatClient) {
         chatClient.setIdentity(identity);
-        System.out.println(former + " is now " + identity);
+
+        if (former.equals("")){
+            System.out.println("Connected to localhost as " + identity);
+        } else if (former.equals(identity)) {
+            System.out.println("Requested identity invalid or in use");
+        } else {
+            System.out.println(former + " is now " + identity);
+        }
     }
 }

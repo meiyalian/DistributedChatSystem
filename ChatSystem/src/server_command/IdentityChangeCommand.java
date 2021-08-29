@@ -1,14 +1,13 @@
-package command;
+package server_command;
 
+import client_command.NewIdentityCommand;
 import com.google.gson.Gson;
 import server.ChatManager;
 import server.ServerConnection;
+import shared.IdentityValidator;
 
-import java.util.ArrayList;
-
-public class IdentityChangeCommand extends Command{
+public class IdentityChangeCommand extends ServerCommand {
     private String identity;
-    private final Gson gson = new Gson();
     private final String type = "identitychange";
 
     public IdentityChangeCommand(String identity){
@@ -17,11 +16,12 @@ public class IdentityChangeCommand extends Command{
 
     @Override
     public void execute(ServerConnection serverConnection){
+        Gson gson = new Gson();
         String formerID = serverConnection.getName();
         String newID = identity;
         ChatManager chatManager = serverConnection.getChatManager();
 
-        if (isIdentityInList(chatManager, identity) || isIdentityInvalid(identity)){
+        if (IdentityValidator.isIdentityInList(chatManager, identity) || IdentityValidator.isIdentityInvalid(identity)){
             newID = formerID;
         }
 
@@ -39,34 +39,10 @@ public class IdentityChangeCommand extends Command{
             System.out.println("Requested identity invalid or in use");
             chatManager.sendToOneClient(jsonMessage, serverConnection);
         } else {
+            System.out.println(formerID + " is now " + newID);
             chatManager.broadCast(jsonMessage);
         }
 
     }
-
-    private synchronized boolean isIdentityInList(ChatManager chatManager, String identity){
-        ArrayList<ServerConnection> serverConnections = chatManager.getClientConnectionList();
-        for (ServerConnection serverConnection: serverConnections){
-            if (identity.equals(serverConnection.getName())){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Requirements:
-     * 1. must be an alphanumeric string: character and digits only
-     * 2. must start with an upper or lower case character
-     * 3. 3 <= length <=16
-     * @return boolean
-     */
-    private boolean isIdentityInvalid(String identity){
-        boolean matchResult = identity.matches("[A-Za-z0-9]+"); // 1
-        boolean firstCharacterCheck = Character.isLetter(identity.charAt(0)); // 2
-        boolean lengthCheckResult = identity.length() >= 3 && identity.length() <= 16; // 3
-        return !(matchResult && lengthCheckResult && firstCharacterCheck);
-    }
-
 
 }
