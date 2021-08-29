@@ -45,6 +45,7 @@ public class ChatServer {
     public void handle() {
         try {
             ServerSocket serverSocket = new ServerSocket();
+            //todo: localhost must be changed to IP address for multiple clients to connect
             serverSocket.bind(new InetSocketAddress("localhost", port));
             alive = true;
 

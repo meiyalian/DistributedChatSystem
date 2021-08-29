@@ -6,9 +6,10 @@ import java.net.Socket;
 public class ChatClient {
     private final Socket socket;
     private String identity = "";
-    private String roomName = "MainHall";
+    private String roomid = "MainHall";
     public static final int PORT = 6379;
 
+    //todo: localhost must be changed to IP address for multiple clients to connect
     public ChatClient() throws IOException {
         this.socket = new Socket("localhost", PORT);
     }
@@ -34,7 +35,7 @@ public class ChatClient {
     }
 
     public void printPrefix(){
-        System.out.print("[" + roomName + "] " + identity + "> ");
+        System.out.print("[" + roomid + "] " + identity + "> ");
     }
 
     public void handle() throws IOException {
