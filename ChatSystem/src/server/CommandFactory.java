@@ -11,24 +11,21 @@ public class CommandFactory {
         this.gson = new Gson();
     }
 
-    public Command convertJsonToCommand(String jsonMessage){
+    /**
+     * Convert json message sent by client at server side to command object
+     * @param jsonMessage
+     * @return
+     */
+    public Command convertClientMessageToCommand(String jsonMessage){
         String type = gson.fromJson(jsonMessage, JsonObject.class).get("type").getAsString();
 
         switch(type){
-            case "newidentity":
-                return this.gson.fromJson(jsonMessage, NewIdentityCommand.class);
             case "identitychange":
                 return this.gson.fromJson(jsonMessage, IdentityChangeCommand.class);
             case "join":
                 return this.gson.fromJson(jsonMessage, JoinCommand.class);
-            case "roomchange":
-                return this.gson.fromJson(jsonMessage, RoomChangeCommand.class);
-            case "roomcontents":
-                return this.gson.fromJson(jsonMessage, RoomContentsCommand.class);
             case "who":
                 return this.gson.fromJson(jsonMessage, WhoCommand.class);
-            case "roomlist":
-                return this.gson.fromJson(jsonMessage, RoomListCommand.class);
             case "list":
                 return this.gson.fromJson(jsonMessage, ListCommand.class);
             case "createroom":

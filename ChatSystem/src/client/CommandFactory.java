@@ -4,10 +4,32 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import command.*;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 
 public class CommandFactory {
     private final Gson gson = new Gson();
 
+    /**
+     * Message can be in two formats:
+     * 1. "Hello World"
+     * 2. Hello Word
+     * if it is number 2, we need to join them together to produce a new string as input
+     * @param inputArray
+     * @return
+     */
+    private String joinMultipleArguments(String[] inputArray){
+        ArrayList<String> arrayList = new ArrayList<>(Arrays.asList(inputArray));
+        return String.join(" ", arrayList.subList(1, arrayList.size()));
+    }
+
+    /**
+     * Covert user inputs to new command
+     * Populate user input argument to initialize command object
+     * @param userInput
+     * @return
+     */
     public Command convertUserInputToCommand(String userInput){
         String[] inputArray = userInput.split(" ");
         int inputLength = inputArray.length;
@@ -17,7 +39,7 @@ public class CommandFactory {
             String type = inputArray[0].substring(1);
             String arg = "";
             if (inputLength > 1){
-                arg = inputArray[1];
+                arg = this.joinMultipleArguments(inputArray);
             }
 
             switch(type){
@@ -46,6 +68,11 @@ public class CommandFactory {
         return new MessageCommand("");
     }
 
+    /**
+     * Covert json messages that are sent from server at client side to command object
+     * @param jsonMessage
+     * @return
+     */
     public Command convertServerMessageToCommand(String jsonMessage){
         String type = gson.fromJson(jsonMessage, JsonObject.class).get("type").getAsString();
 

@@ -25,7 +25,7 @@ public class ServerConnection extends Thread {
     }
 
     private void executeCommand(String jsonMessage){
-        Command command = commandFactory.convertJsonToCommand(jsonMessage);
+        Command command = commandFactory.convertClientMessageToCommand(jsonMessage);
         command.execute(this);
     }
 
