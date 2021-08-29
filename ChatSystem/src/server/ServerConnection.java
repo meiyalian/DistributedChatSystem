@@ -25,6 +25,8 @@ public class ServerConnection extends Thread {
         setName("");
     }
 
+    public ChatManager getChatManager(){return this.chatManager;}
+
     private void executeCommand(String jsonMessage){
         Command command = commandFactory.convertClientMessageToCommand(jsonMessage);
         command.execute(this);

@@ -13,6 +13,8 @@ public class ChatManager {
         clientConnectionList = new ArrayList<>();
     }
 
+    public synchronized ArrayList<ServerConnection> getClientConnectionList() {return clientConnectionList;}
+
     public synchronized void addClientConnection(ServerConnection connection){
         clientConnectionList.add(connection);
     }
@@ -21,9 +23,19 @@ public class ChatManager {
         clientConnectionList.remove(connection);
     }
 
-    private synchronized void broadCast(String message, ServerConnection ignored){
+    public synchronized void sendToOneClient(String message, ServerConnection serverConnection){
+        serverConnection.sendMessage(message);
+    }
+
+    public synchronized void broadCast(String message){
         for (ServerConnection conn: clientConnectionList){
-            if (!conn.equals(ignored)){
+            conn.sendMessage(message);
+        }
+    }
+
+    public synchronized void broadCast(String message, ArrayList<ServerConnection> ignoredConnections){
+        for (ServerConnection conn: clientConnectionList){
+            if (!ignoredConnections.contains(conn)){
                 conn.sendMessage(message);
             }
         }
