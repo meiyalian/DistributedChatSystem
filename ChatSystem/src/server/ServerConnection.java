@@ -8,7 +8,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-public class ServerSideConnection extends Thread {
+public class ServerConnection extends Thread {
     private Socket socket;
     private ChatManager chatManager;
     private CommandFactory commandFactory;
@@ -16,7 +16,7 @@ public class ServerSideConnection extends Thread {
     private BufferedReader reader;
     private boolean connection_alive;
 
-    public ServerSideConnection(Socket socket, ChatManager chatManager, CommandFactory commandFactory) throws IOException {
+    public ServerConnection(Socket socket, ChatManager chatManager, CommandFactory commandFactory) throws IOException {
         this.socket = socket;
         this.chatManager = chatManager;
         this.commandFactory = commandFactory;
@@ -45,7 +45,7 @@ public class ServerSideConnection extends Thread {
         close();
     }
 
-    private void leave(ServerSideConnection connection) {
+    private void leave(ServerConnection connection) {
         chatManager.removeClientConnection(connection);
     }
 

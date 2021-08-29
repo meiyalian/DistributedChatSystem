@@ -1,9 +1,9 @@
 package command;
 
 public class JoinCommand extends Command{
-    private String roomId;
+    private String roomid;
 
-    public JoinCommand(String roomId){
-        this.roomId = roomId;
+    public JoinCommand(String roomid){
+        this.roomid = roomid;
     }
 }

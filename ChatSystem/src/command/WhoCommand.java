@@ -1,9 +1,9 @@
 package command;
 
 public class WhoCommand extends Command{
-    private String roomId;
+    private String roomid;
 
-    public WhoCommand(String roomId){
-        this.roomId = roomId;
+    public WhoCommand(String roomid){
+        this.roomid = roomid;
     }
 }

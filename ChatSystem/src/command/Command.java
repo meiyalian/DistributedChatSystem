@@ -2,16 +2,16 @@ package command;
 
 import client.ChatClient;
 import com.google.gson.Gson;
-import server.ServerSideConnection;
+import server.ServerConnection;
 
 public class Command {
     private final Gson gson = new Gson();
 
     /**
      * The detailed implementation is left to the child class to implement
-     * @param serverSideConnection
+     * @param serverConnection
      */
-    public void execute(ServerSideConnection serverSideConnection){};
+    public void execute(ServerConnection serverConnection){};
 
     /**
      * The detailed implementation is left to the child class to implement
@@ -23,7 +23,7 @@ public class Command {
         return gson.toJson(this);
     }
 
-    public void sendJsonMessage(ServerSideConnection serverSideConnection){
-        serverSideConnection.sendMessage(this.convertObjectToJson());
+    public void sendJsonMessage(ServerConnection serverConnection){
+        serverConnection.sendMessage(this.convertObjectToJson());
     }
 }

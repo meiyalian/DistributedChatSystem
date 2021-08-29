@@ -1,9 +1,9 @@
 package command;
 
 public class DeleteCommand extends Command{
-    private String roomId;
+    private String roomid;
 
-    public DeleteCommand(String roomId){
-        this.roomId = roomId;
+    public DeleteCommand(String roomid){
+        this.roomid = roomid;
     }
 }

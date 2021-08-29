@@ -1,6 +1,6 @@
 package command;
 
-import server.ServerSideConnection;
+import server.ServerConnection;
 
 /**
  * This class is used when client first connect to server or client requests for an identity change
@@ -18,7 +18,7 @@ public class NewIdentityCommand extends Command{
     }
 
     @Override
-    public void execute(ServerSideConnection serverSideConnection) {
+    public void execute(ServerConnection serverConnection) {
 
     }
 }
