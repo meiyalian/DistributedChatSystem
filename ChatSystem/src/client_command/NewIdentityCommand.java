@@ -25,9 +25,14 @@ public class NewIdentityCommand extends ClientCommand {
             System.out.println("Connected to localhost as " + identity);
         } else if (former.equals(identity)) {
             System.out.println("Requested identity invalid or in use");
-        } else {
+        } else if (former.equals(chatClient.getIdentity())) {
             System.out.println(former + " is now " + identity);
+        } else {
+            System.out.println("\n" + former + " is now " + identity);
         }
-        chatClient.printPrefix();
+
+        if (!former.equals("")){
+            chatClient.printPrefix();
+        }
     }
 }

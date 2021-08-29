@@ -17,7 +17,7 @@ public class ChatManager {
 
     public synchronized void addClientConnection(ServerConnection connection, String jsonMessage){
         clientConnectionList.add(connection);
-        this.broadCast(jsonMessage);
+        this.sendToOneClient(jsonMessage, connection);
     }
 
     public  synchronized  void removeClientConnection(ServerConnection connection){
