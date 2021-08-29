@@ -33,7 +33,7 @@ public class NewIdentityCommand extends ClientCommand {
             System.out.println(former + " is now " + identity);
         } else {
             // if former is not equal to chatClient identity, this means that another client has changed the identity
-            System.out.println(former + " is now " + identity);
+            System.out.println("\n" + former + " is now " + identity);
         }
 
         if (!firstTimeConnection){
