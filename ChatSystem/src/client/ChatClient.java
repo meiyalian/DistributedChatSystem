@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.Socket;
 
 public class ChatClient {
-    private Socket socket;
+    private final Socket socket;
     private String identity = "";
     public static final int PORT = 6379;
 
@@ -26,7 +26,7 @@ public class ChatClient {
 
     public void handle() throws IOException {
         ClientSender clientSender = new ClientSender(socket);
-        clientSender.run();
+        clientSender.start();
     }
 
     public static void main(String[] args){

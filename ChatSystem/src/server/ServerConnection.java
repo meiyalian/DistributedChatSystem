@@ -22,6 +22,7 @@ public class ServerConnection extends Thread {
         this.commandFactory = commandFactory;
         this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         this.writer = new PrintWriter(socket.getOutputStream());
+        setName("");
     }
 
     private void executeCommand(String jsonMessage){

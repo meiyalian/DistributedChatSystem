@@ -34,7 +34,7 @@ class ClientSender extends Thread{
         this.userInput.close();
         this.writer.close();
         this.socket.close();
-        System.out.println("Connection closed.");
+        System.out.println("Warning: Client sender connection closed!");
     }
 
     public void run() {
@@ -45,6 +45,8 @@ class ClientSender extends Thread{
                 if (str != null){
                     Command command = commandFactory.convertUserInputToCommand(str);
                     String jsonMessage = gson.toJson(command);
+                    // convert user input to command and convert command to json object
+                    // then send this json command object to server
                     this.writer.println(jsonMessage);
                 }
             } catch (IOException e) {

@@ -15,20 +15,39 @@ public class ClientReceiver extends Thread{
     private boolean connection_alive;
 
     public ClientReceiver(ChatClient chatClient) throws IOException {
-        socket = chatClient.getSocket();
-        commandFactory = new CommandFactory();
+        this.socket = chatClient.getSocket();
+        this.commandFactory = new CommandFactory();
         this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF8"));
-        connection_alive = true;
-        while (connection_alive) {
-            String str = reader.readLine();
-            if (str != null){
-                Command command = commandFactory.convertServerMessageToCommand(str);
-                command.execute(chatClient);
-            }
-        }
     }
 
-    public void run(){
+    public void close() throws IOException {
+        this.reader.close();
+        this.socket.close();
+        System.out.println("Warning: Client receiver connection closed.");
+    }
 
+
+    public void run(){
+        this.connection_alive = true;
+        while (connection_alive) {
+            try {
+                String str = reader.readLine();
+                if (str != null){
+                    Command command = commandFactory.convertServerMessageToCommand(str);
+                    if (command != null){
+                        command.execute(chatClient);
+                    }
+                }
+            } catch (IOException e) {
+                this.connection_alive = false;
+                e.printStackTrace();
+            }
+        }
+
+        try {
+            close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
