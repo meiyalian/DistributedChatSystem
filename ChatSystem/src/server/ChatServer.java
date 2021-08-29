@@ -22,7 +22,7 @@ public class ChatServer {
         new ChatServer().handle();
     }
 
-    private synchronized  void generateIdentityForNewClient(ServerConnection serverConnection){
+    private synchronized String generateIdentityForNewClient(ServerConnection serverConnection){
         String newID = autoGenerateIdentity();
 
         // set serverConnection name to "guest1"
@@ -30,8 +30,7 @@ public class ChatServer {
         NewIdentityCommand newIdentityCommand = new NewIdentityCommand("", newID);
 
         // broadcast {"type": "newidentity", "identity": "guest1"} to client
-        String jsonMessage = gson.toJson(newIdentityCommand);
-        chatManager.broadCast(jsonMessage);
+        return gson.toJson(newIdentityCommand);
     }
 
     private synchronized String autoGenerateIdentity(){
@@ -50,13 +49,12 @@ public class ChatServer {
             alive = true;
 
             while (alive){
-                System.out.println("Wait for client connection request: ");
                 Socket soc = serverSocket.accept();
                 ServerConnection serverConnection = new ServerConnection(soc, chatManager, commandFactory);
                 serverConnection.start(); // connection is thread
 
-                generateIdentityForNewClient(serverConnection);
-                chatManager.addClientConnection(serverConnection);
+                String jsonMessage = generateIdentityForNewClient(serverConnection);
+                chatManager.addClientConnection(serverConnection, jsonMessage);
             }
         } catch (IOException e) {
             alive = false;

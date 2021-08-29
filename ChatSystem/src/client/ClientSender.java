@@ -43,12 +43,6 @@ class ClientSender extends Thread{
         connection_alive = true;
         while (connection_alive) {
             try {
-                // [Room] guest5> #join comp90015
-                // this is to make sure that prefix "[Room] guest5>" is before the user input
-                String clientID = chatClient.getIdentity();
-                if (!clientID.equals("")){
-                    System.out.println(clientID + "> ");
-                }
                 String str = userInput.readLine();
                 if (str != null){
                     ServerCommand command = commandFactory.convertUserInputToCommand(str);

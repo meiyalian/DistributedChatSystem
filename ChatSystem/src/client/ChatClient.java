@@ -6,6 +6,7 @@ import java.net.Socket;
 public class ChatClient {
     private final Socket socket;
     private String identity = "";
+    private String roomName = "MainHall";
     public static final int PORT = 6379;
 
     public ChatClient() throws IOException {
@@ -30,6 +31,10 @@ public class ChatClient {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void printPrefix(){
+        System.out.print("[" + roomName + "] " + identity + "> ");
     }
 
     public void handle() throws IOException {

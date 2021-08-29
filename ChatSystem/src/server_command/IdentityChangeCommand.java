@@ -36,10 +36,8 @@ public class IdentityChangeCommand extends ServerCommand {
          */
         String jsonMessage = gson.toJson(newIdentityCommand);
         if (newID.equals(formerID)){
-            System.out.println("Requested identity invalid or in use");
             chatManager.sendToOneClient(jsonMessage, serverConnection);
         } else {
-            System.out.println(formerID + " is now " + newID);
             chatManager.broadCast(jsonMessage);
         }
 

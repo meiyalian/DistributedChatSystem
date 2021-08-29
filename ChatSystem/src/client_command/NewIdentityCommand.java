@@ -28,5 +28,6 @@ public class NewIdentityCommand extends ClientCommand {
         } else {
             System.out.println(former + " is now " + identity);
         }
+        chatClient.printPrefix();
     }
 }
