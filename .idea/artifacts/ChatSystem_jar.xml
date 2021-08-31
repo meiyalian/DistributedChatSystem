@@ -1,0 +1,12 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="ChatSystem:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/ChatSystem_jar</output-path>
+    <root id="archive" name="ChatSystem.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/ChatSystem/src/client/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="module-output" name="ChatSystem" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/ChatSystem/gson-2.8.8.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

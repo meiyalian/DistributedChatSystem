@@ -15,6 +15,7 @@ public class ServerConnection extends Thread {
     private PrintWriter writer;
     private BufferedReader reader;
     private boolean connection_alive;
+    private String currentChatRoom;
 
     public ServerConnection(Socket socket, ChatManager chatManager, CommandFactory commandFactory) throws IOException {
         this.socket = socket;
@@ -23,6 +24,14 @@ public class ServerConnection extends Thread {
         this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         this.writer = new PrintWriter(socket.getOutputStream());
         setName("");
+    }
+
+    public void setCurrentChatRoom(String currentChatRoom) {
+        this.currentChatRoom = currentChatRoom;
+    }
+
+    public String getCurrentChatRoom() {
+        return currentChatRoom;
     }
 
     public ChatManager getChatManager(){return this.chatManager;}
@@ -48,6 +57,7 @@ public class ServerConnection extends Thread {
         close();
     }
 
+    //Todo: leave chatroom
     private void leave(ServerConnection connection) {
         chatManager.removeClientConnection(connection);
     }

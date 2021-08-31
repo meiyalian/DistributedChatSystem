@@ -7,15 +7,15 @@ import java.util.ArrayList;
 
 public class IdentityValidator {
 
-    public static synchronized boolean isIdentityInList(ChatManager chatManager, String identity){
-        ArrayList<ServerConnection> serverConnections = chatManager.getClientConnectionList();
-        for (ServerConnection serverConnection: serverConnections){
-            if (identity.equals(serverConnection.getName())){
-                return true;
-            }
-        }
-        return false;
-    }
+//    public static synchronized boolean isIdentityInList(ChatManager chatManager, String identity){
+//        ArrayList<ServerConnection> serverConnections = chatManager.getClientConnectionList();
+//        for (ServerConnection serverConnection: serverConnections){
+//            if (identity.equals(serverConnection.getName())){
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
     /**
      * Requirements:
