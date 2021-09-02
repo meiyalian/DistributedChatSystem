@@ -25,8 +25,8 @@ public class ChatManager {
 
     public void addClientConnection(ServerConnection connection, String jsonMessage){
         // place client to default room
+        LOGGER.info("Add " + connection.getName() + " to MainHall");
         ArrayList<ServerConnection> mainHall =this.chatRooms.get(defaultRoomName);
-        LOGGER.info("Add " + connection.getName() + " to mainHall");
         synchronized(mainHall){
             mainHall.add(connection);
         }
@@ -38,22 +38,36 @@ public class ChatManager {
     public void removeClientConnection(ServerConnection connection){
 
         String roomName = connection.getCurrentChatRoom();
-        ArrayList<ServerConnection> room = this.chatRooms.get(roomName);
         LOGGER.info("Remove " + connection.getName() + " from " + roomName);
-        synchronized(room) {
-            room.remove(connection);
 
-            // if the room creator quit, set room owner to null
+        synchronized (this.chatRooms){
+            ArrayList<ServerConnection> currentRoomClientList = this.chatRooms.get(roomName);
+            currentRoomClientList.remove(roomName);
+        }
+
+        // if the room creator quit, set room owner to null
+        synchronized (this.roomOwnership) {
             if (this.roomOwnership.get(roomName).equals(connection)) {
                 this.roomOwnership.put(roomName, null);
             }
-            // discard the room when the following conditions applied:
-            if (room.size() == 0 && !roomName.equals(ChatManager.defaultRoomName) && roomOwnership.get(roomName) == null) {
-                LOGGER.info("Remove room " +  roomName);
-                this.chatRooms.remove(roomName);
-                this.roomOwnership.remove(roomName);
+        }
+        // get room owner
+        ServerConnection currentOwner;
+        synchronized (this.roomOwnership){
+            currentOwner = this.roomOwnership.get(roomName);
+        }
+
+        //discard the room when the following conditions applied:
+        if (getRoomSize(roomName)== 0 && !roomName.equals(ChatManager.defaultRoomName) && currentOwner == null) {
+            LOGGER.info("Remove room " +  roomName);
+            synchronized (this.chatRooms){
+                this.chatRooms.remove(roomName); // remove room
+            }
+            synchronized (this.roomOwnership){
+                this.roomOwnership.remove(roomName); // remove the ownership infor since the room is removed
             }
         }
+
     }
 
     public void broadCastAllRooms(String message, ServerConnection ignore){
@@ -96,6 +110,27 @@ public class ChatManager {
         }
         return true;
     }
+
+
+    public synchronized boolean joinRoom (ServerConnection s, String roomid){
+        ArrayList<ServerConnection> newRoom = this.chatRooms.getOrDefault(roomid, null);
+        // if the room to join exists
+        if (newRoom != null){
+            LOGGER.info("Client " +  s.getName() + " join the room " + roomid);
+            String currentRoom = s.getCurrentChatRoom();
+            ArrayList<ServerConnection> currentRoomClientList = this.chatRooms.get(currentRoom);
+            currentRoomClientList.remove(s);
+            newRoom.add(s);
+            s.setCurrentChatRoom(roomid);
+            return true;
+        }
+        return false;
+    }
+
+    public synchronized int getRoomSize(String roomid){
+        return this.chatRooms.get(roomid).size();
+    }
+
 
 
 }

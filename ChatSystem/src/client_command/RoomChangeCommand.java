@@ -17,5 +17,15 @@ public class RoomChangeCommand extends ClientCommand{
     @Override
     public void execute(ChatClient chatClient) {
 
+        if(!former.equals(roomid)){
+            if (identity.equals(chatClient.getIdentity())){
+                chatClient.setRoomid(roomid);
+            }
+            System.out.println(identity + " moved from " + former + " to " + roomid);
+        }else{
+            System.out.println("The requested room is invalid or non existent");
+        }
+
+        chatClient.printPrefix();
     }
 }

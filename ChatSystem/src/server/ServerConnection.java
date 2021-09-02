@@ -37,6 +37,7 @@ public class ServerConnection extends Thread {
     public ChatManager getChatManager(){return this.chatManager;}
 
     private void executeCommand(String jsonMessage){
+
         ServerCommand command = commandFactory.convertClientMessageToCommand(jsonMessage);
         command.execute(this);
     }
@@ -48,6 +49,7 @@ public class ServerConnection extends Thread {
             try {
                 String jsonMessage = this.reader.readLine();
                 if (jsonMessage != null){
+                    System.out.println("receive: " + jsonMessage);
                     executeCommand(jsonMessage);
                 }
             } catch (IOException e){
