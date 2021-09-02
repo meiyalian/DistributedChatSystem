@@ -40,7 +40,6 @@ public class IdentityChangeCommand extends ServerCommand {
             chatManager.sendToOneClient(jsonMessage, serverConnection);
         } else {
             chatManager.broadCastToCurrentRoom(serverConnection,jsonMessage, null );
-
         }
 
     }
