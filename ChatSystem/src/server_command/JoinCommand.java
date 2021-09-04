@@ -37,7 +37,13 @@ public class JoinCommand extends ServerCommand{
             jsonMessage = gson.toJson(roomChangeCommand);
             chatManager.broadCastToCurrentRoom(serverConnection, jsonMessage, null);
 
-            //TODO: if it's mainHall send roomlist
+            //if it's mainHall send roomContent
+            if (this.roomid.equals("mainHall")){
+                jsonMessage = WhoCommand.buildRoomContent(chatManager,"mainHall" );
+                chatManager.sendToOneClient(jsonMessage,serverConnection );
+                //TODO: if it's mainHall send roomlist
+            }
+
         }
         else{ // if requested room is the current room or the requested does not exist, the request is invalid
             roomChangeCommand = new RoomChangeCommand(identity, former, former);

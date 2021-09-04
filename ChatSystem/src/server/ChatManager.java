@@ -131,6 +131,27 @@ public class ChatManager {
         return this.chatRooms.get(roomid).size();
     }
 
+    public String getRoomOwner(String roomid){
+        ServerConnection owner;
+        synchronized(this.roomOwnership) {
+            owner = this.roomOwnership.getOrDefault(roomid, null);
+        }
+        return owner == null? "" : owner.getName();
+    }
+
+    public synchronized ArrayList<String> getRoomIdentities(String roomid){
+        LOGGER.info("Client requests " + roomid + " identities");
+        ArrayList<String> identities = new ArrayList<>();
+        ArrayList<ServerConnection> clientsInRoom = this.chatRooms.getOrDefault(roomid, null);
+        if (clientsInRoom != null){
+            for(ServerConnection s: clientsInRoom){
+                identities.add(s.getName());
+            }
+        }
+        return identities;
+    }
+
+
 
 
 }
