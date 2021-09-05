@@ -21,7 +21,8 @@ public class IdentityChangeCommand extends ServerCommand {
         String newID = identity;
         ChatManager chatManager = serverConnection.getChatManager();
 
-        if (IdentityValidator.isIdentityInList(chatManager, identity) || IdentityValidator.isIdentityInvalid(identity)){
+
+        if ( IdentityValidator.isIdentityInvalid(identity) || !chatManager.isUniqueIdentity(identity) ){
             newID = formerID;
         }
 
@@ -38,7 +39,7 @@ public class IdentityChangeCommand extends ServerCommand {
         if (newID.equals(formerID)){
             chatManager.sendToOneClient(jsonMessage, serverConnection);
         } else {
-            chatManager.broadCast(jsonMessage);
+            chatManager.broadCastToCurrentRoom(serverConnection,jsonMessage, null );
         }
 
     }

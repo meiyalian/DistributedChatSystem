@@ -18,7 +18,6 @@ public class CommandFactory {
      */
     public ServerCommand convertClientMessageToCommand(String jsonMessage){
         String type = gson.fromJson(jsonMessage, JsonObject.class).get("type").getAsString();
-
         switch(type){
             case "identitychange":
                 return this.gson.fromJson(jsonMessage, IdentityChangeCommand.class);

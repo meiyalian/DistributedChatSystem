@@ -9,11 +9,11 @@ import org.apache.commons.cli.Options;
 
 
 import client_command.NewIdentityCommand;
-import shared.IdentityValidator;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.logging.Logger;
 
 public class ChatServer {
     private final int port;
@@ -23,6 +23,7 @@ public class ChatServer {
     private static final ChatManager chatManager = new ChatManager();
     private static final CommandFactory commandFactory = new CommandFactory();
     private boolean alive;
+    public static final Logger LOGGER = Logger.getLogger(ChatServer.class.getName());
 
     public ChatServer(int port){
         this.port = port;
@@ -43,13 +44,13 @@ public class ChatServer {
             } else {
                 port = DEFAULT_PORT;
             }
-            System.out.println("Port number: " + port);
         } catch (ParseException e){
             e.printStackTrace();
             System.out.println("Default port " + DEFAULT_PORT + " will be used.");
             port = DEFAULT_PORT;
         }
 
+        LOGGER.info("Listening on port " + port);
         new ChatServer(port).handle();
     }
 
@@ -67,10 +68,11 @@ public class ChatServer {
     private synchronized String autoGenerateIdentity(){
         String identity = "guest" + identityCount;
         identityCount += 1;
-        while (IdentityValidator.isIdentityInList(chatManager, identity)){
-            identity = "guest" + identityCount;
-            identityCount += 1;
-        }
+        //TODO ?
+//        while (IdentityValidator.isIdentityInList(chatManager, identity)){
+//            identity = "guest" + identityCount;
+//            identityCount += 1;
+//        }
         return identity;
     }
 
@@ -81,11 +83,16 @@ public class ChatServer {
 
             while (alive){
                 Socket soc = serverSocket.accept();
-                ServerConnection serverConnection = new ServerConnection(soc, chatManager, commandFactory);
-                serverConnection.start(); // connection is thread
+                if (soc != null){
+                    LOGGER.info("New connection received: " + soc.getRemoteSocketAddress().toString());
+                    ServerConnection serverConnection = new ServerConnection(soc, chatManager, commandFactory);
 
-                String jsonMessage = generateIdentityForNewClient(serverConnection);
-                chatManager.addClientConnection(serverConnection, jsonMessage);
+                    //send first msg to client
+                    String jsonMessage = generateIdentityForNewClient(serverConnection);
+                    chatManager.addClientConnection(serverConnection, jsonMessage);
+                    serverConnection.start(); // start thread
+                }
+
             }
         } catch (IOException e) {
             alive = false;

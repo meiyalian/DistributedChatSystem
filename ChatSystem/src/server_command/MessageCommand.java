@@ -28,7 +28,7 @@ public class MessageCommand extends ServerCommand{
         MessageRelayCommand messageRelayCommand = new MessageRelayCommand(identity, this.content);
         String jsonMessage = gson.toJson(messageRelayCommand);
 
-        chatManager.broadCast(jsonMessage);
+        chatManager.broadCastToCurrentRoom(serverConnection, jsonMessage, null);
 
     }
 }

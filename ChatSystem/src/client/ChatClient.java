@@ -15,12 +15,11 @@ public class ChatClient {
     private String roomid = "MainHall";
     private static final int DEFAULT_PORT = 6379;
 
-    //todo: localhost must be changed to IP address for multiple clients to connect
     public ChatClient(String hostname, int port) throws IOException {
         this.socket = new Socket(hostname, port);
     }
 
-    public Socket getSocket(){
+    public Socket getSocket() {
         return this.socket;
     }
 
@@ -62,6 +61,7 @@ public class ChatClient {
             System.out.println("Default port " + DEFAULT_PORT + " will be used.");
             port = DEFAULT_PORT;
         }
+
         try {
             new ChatClient(hostname, port).handle();
         } catch (IOException e) {
@@ -69,7 +69,7 @@ public class ChatClient {
         }
     }
 
-    public void printPrefix(){
+    public void printPrefix() {
         System.out.print("[" + roomid + "] " + identity + "> ");
     }
 
@@ -79,5 +79,13 @@ public class ChatClient {
 
         clientSender.start();
         clientReceiver.start();
+    }
+
+    public void setRoomid(String roomid) {
+        this.roomid = roomid;
+    }
+
+    public String getRoomid() {
+        return roomid;
     }
 }
