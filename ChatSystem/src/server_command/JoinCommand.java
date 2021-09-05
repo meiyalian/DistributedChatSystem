@@ -42,6 +42,8 @@ public class JoinCommand extends ServerCommand{
                 jsonMessage = WhoCommand.buildRoomContent(chatManager,"mainHall" );
                 chatManager.sendToOneClient(jsonMessage,serverConnection );
                 //TODO: if it's mainHall send roomlist
+                jsonMessage = ListCommand.buildRoomList(chatManager);
+                chatManager.sendToOneClient(jsonMessage, serverConnection);
             }
 
         }

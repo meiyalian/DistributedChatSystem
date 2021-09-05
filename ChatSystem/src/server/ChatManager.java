@@ -2,6 +2,7 @@ package server;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 
@@ -151,7 +152,13 @@ public class ChatManager {
         return identities;
     }
 
-
-
-
+    public HashMap<String, Integer> getRoomsInfo(){
+        HashMap<String, Integer> roomsInfo = new HashMap<>();
+        synchronized (this.chatRooms){
+            for (Map.Entry<String, ArrayList<ServerConnection>> entry : this.chatRooms.entrySet()){
+                roomsInfo.put(entry.getKey(), entry.getValue().size());
+            }
+        }
+        return roomsInfo;
+    }
 }

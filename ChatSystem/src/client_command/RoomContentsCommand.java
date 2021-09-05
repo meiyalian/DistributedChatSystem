@@ -22,10 +22,11 @@ public class RoomContentsCommand extends ClientCommand{
 
     @Override
     public void execute(ChatClient chatClient) {
-        String print = "Room ID:" + roomId + "\n" + "Identities:[ ";
+        StringBuilder print = new StringBuilder(roomId + " contains ");
         for(String str: identities){
-            print += str + ", ";
+            print.append(str).append(" ");
         }
-        System.out.println(print.substring(0, print.length()-2) + " ]\nOwner: " + (owner.equals("")? "None":owner));
+        System.out.println(print);
+        chatClient.printPrefix();
     }
 }
