@@ -37,6 +37,7 @@ public class ClientReceiver extends Thread{
                 String str = reader.readLine();
                 if (str != null){
                     ClientCommand command = commandFactory.convertServerMessageToCommand(str);
+//                    System.out.println("receive: " + str);
                     if (command != null){
                         command.execute(chatClient);
                     }

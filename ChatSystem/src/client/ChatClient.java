@@ -14,7 +14,7 @@ public class ChatClient {
         this.socket = new Socket("localhost", PORT);
     }
 
-    public Socket getSocket(){
+    public Socket getSocket() {
         return this.socket;
     }
 
@@ -26,7 +26,7 @@ public class ChatClient {
         return identity;
     }
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         try {
             new ChatClient().handle();
         } catch (IOException e) {
@@ -34,7 +34,7 @@ public class ChatClient {
         }
     }
 
-    public void printPrefix(){
+    public void printPrefix() {
         System.out.print("[" + roomid + "] " + identity + "> ");
     }
 
@@ -44,5 +44,13 @@ public class ChatClient {
 
         clientSender.start();
         clientReceiver.start();
+    }
+
+    public void setRoomid(String roomid) {
+        this.roomid = roomid;
+    }
+
+    public String getRoomid() {
+        return roomid;
     }
 }
