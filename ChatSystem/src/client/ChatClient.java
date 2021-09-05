@@ -72,6 +72,7 @@ public class ChatClient {
         try {
             new ChatClient(hostname, port).handle();
         } catch (IOException e) {
+            System.out.println("host name: " + hostname + " port number: " + port);
             e.printStackTrace();
         }
     }
