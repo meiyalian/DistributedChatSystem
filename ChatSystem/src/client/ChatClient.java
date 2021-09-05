@@ -40,9 +40,16 @@ public class ChatClient {
         options.addOption("p", "port", true, "Port");
 
         /** get command line input: hostname or IP address */
-        if (args.length == 1 | args.length == 3){
+        if (args.length == 1){
             hostname = args[0];
-        } else {
+        } else if (args.length == 3){
+            if (args[0].equals("-p") | args[0].equals("-port")){
+                hostname = args[2];
+            } else {
+                hostname = args[0];
+            }
+        }
+        else {
             hostname = "localhost";
         }
 

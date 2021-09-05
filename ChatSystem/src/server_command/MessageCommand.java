@@ -19,11 +19,10 @@ public class MessageCommand extends ServerCommand{
         Gson gson = new Gson();
         ChatManager chatManager = serverConnection.getChatManager();
 
-        /** message sent to client:
+        /** message sent to client in the same room:
          * {"type": "message", "identity": "aaron", "content": "Hi there!"}
          * id of the sender is appended to the message
          */
-        // todo:broadcast message to clients in the same room
         String identity = serverConnection.getName();
         MessageRelayCommand messageRelayCommand = new MessageRelayCommand(identity, this.content);
         String jsonMessage = gson.toJson(messageRelayCommand);
