@@ -49,13 +49,17 @@ class ClientSender extends Thread{
                 String str = userInput.readLine();
                 if (str != null){
                     ServerCommand command = commandFactory.convertUserInputToCommand(str);
-                    String jsonMessage = gson.toJson(command);
-                    // convert user input to command and convert command to json object
-                    // then send this json command object to server
-                    this.writer.println(jsonMessage);
+                    if (command != null){
+                        String jsonMessage = gson.toJson(command);
+                        // convert user input to command and convert command to json object
+                        // then send this json command object to server
+                        this.writer.println(jsonMessage);
 
-                    if (str.equals("#quit")){
-                        connection_alive = false;
+                        if (str.equals("#quit")){
+                            connection_alive = false;
+                        }
+                    } else {
+                        chatClient.printPrefix();
                     }
                 }
             } catch (IOException e) {

@@ -3,6 +3,7 @@ package client;
 import client_command.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import org.apache.commons.cli.CommandLineParser;
 import server_command.*;
 
 import java.util.ArrayList;
@@ -11,6 +12,12 @@ import java.util.Arrays;
 
 public class CommandFactory {
     private final Gson gson = new Gson();
+    private final ArrayList<String> commandRequiresNoInput = new ArrayList<>();
+
+    public CommandFactory(){
+        this.commandRequiresNoInput.add("list");
+        this.commandRequiresNoInput.add("quit");
+    }
 
     /**
      * Message can be in two formats:
@@ -36,12 +43,26 @@ public class CommandFactory {
         int inputLength = inputArray.length;
 
         if (inputLength != 0){
-            // remove the # at the beginning
+
+            /** if the command does not start with #, treat it as normal message */
+            String prefix = inputArray[0].substring(0,1);
             String type = inputArray[0].substring(1);
+
+            if (!prefix.equals("#")){
+                return new MessageCommand(userInput);
+            } else {
+                if (!this.commandRequiresNoInput.contains(type) && inputLength == 1){
+                    System.out.println("Command " + userInput + " is invalid.");
+                    return null;
+                }
+
+            }
+
             String arg = "";
             if (inputLength > 1){
                 arg = this.joinMultipleArguments(inputArray);
             }
+
 
             switch(type){
                 case "identitychange":
@@ -62,7 +83,8 @@ public class CommandFactory {
                     return new QuitCommand();
                 default:
                     // a normal message, not command
-                    return new MessageCommand(userInput);
+                    System.out.println("Command " + userInput + " is invalid.");
+                    return null;
             }
         }
         // if user doesn't input anything

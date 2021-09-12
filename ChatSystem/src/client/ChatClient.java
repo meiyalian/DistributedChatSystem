@@ -111,13 +111,8 @@ public class ChatClient {
 
     public void disconnect() throws IOException, InterruptedException {
         if (clientReceiver != null){
-            System.out.println("receiver close called");
             clientReceiver.setConnection_alive(false);
         }
-//        if (clientSender != null){
-//            System.out.println("sender close called");
-//            clientSender.setConnection_alive(false);
-//        }
         connected = false;
     }
 
