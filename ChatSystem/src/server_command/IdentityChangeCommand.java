@@ -4,7 +4,7 @@ import client_command.NewIdentityCommand;
 import com.google.gson.Gson;
 import server.ChatManager;
 import server.ServerConnection;
-import shared.IdentityValidator;
+import shared.Validator;
 
 public class IdentityChangeCommand extends ServerCommand {
     private String identity;
@@ -22,7 +22,7 @@ public class IdentityChangeCommand extends ServerCommand {
         ChatManager chatManager = serverConnection.getChatManager();
 
 
-        if ( IdentityValidator.isIdentityInvalid(identity) || !chatManager.isUniqueIdentity(identity) ){
+        if ( Validator.isIdentityInvalid(identity) || !chatManager.isUniqueIdentity(identity) ){
             newID = formerID;
         }
 

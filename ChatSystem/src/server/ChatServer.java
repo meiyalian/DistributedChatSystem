@@ -68,11 +68,6 @@ public class ChatServer {
     private synchronized String autoGenerateIdentity(){
         String identity = "guest" + identityCount;
         identityCount += 1;
-        //TODO ?
-//        while (IdentityValidator.isIdentityInList(chatManager, identity)){
-//            identity = "guest" + identityCount;
-//            identityCount += 1;
-//        }
         return identity;
     }
 

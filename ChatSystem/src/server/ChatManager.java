@@ -1,6 +1,16 @@
 package server;
 
+import client_command.RoomChangeCommand;
+import client_command.RoomContentsCommand;
+import client_command.RoomListCommand;
+import com.google.gson.Gson;
+import server_command.JoinCommand;
+import server_command.ListCommand;
+import server_command.WhoCommand;
+import shared.Validator;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -10,11 +20,14 @@ import java.util.logging.Logger;
  * ChatManager class is responsible for performing admin tasks including:
  * managing clients (connections), joining room, changing room, etc.
  */
+
+//TODO: If any room other than MainHall has an em p t y owner and becomes em p t y ( i.e. has no contents ) then the room is deleted immediatel y .
 public class ChatManager {
     private HashMap<String, ArrayList<ServerConnection>> chatRooms;// room list
     private HashMap<String, ServerConnection> roomOwnership;
     protected static String defaultRoomName = "MainHall";
     public static final Logger LOGGER = Logger.getLogger(ChatServer.class.getName());
+    private Gson gson;
 
 
     public ChatManager(){
@@ -22,18 +35,30 @@ public class ChatManager {
         roomOwnership= new HashMap<>();
         chatRooms.put(defaultRoomName, new ArrayList<>());
         roomOwnership.put(defaultRoomName, null); // main hall does not have owner
+        gson =  new Gson();
     }
 
     public void addClientConnection(ServerConnection connection, String jsonMessage){
         // place client to default room
-        LOGGER.info("Add " + connection.getName() + " to MainHall");
-        ArrayList<ServerConnection> mainHall =this.chatRooms.get(defaultRoomName);
-        synchronized(mainHall){
-            mainHall.add(connection);
-        }
-
-        connection.setCurrentChatRoom(defaultRoomName);
+        LOGGER.info("New user:  " + connection.getName());
+//        ArrayList<ServerConnection> mainHall =this.chatRooms.get(defaultRoomName);
+//        synchronized(mainHall){
+//            mainHall.add(connection);
+//        }
+//        connection.setCurrentChatRoom(defaultRoomName);
         this.sendToOneClient(jsonMessage, connection);
+//
+//        String roomLstMsg = ListCommand.buildRoomList(this, null, null);
+//        String roomContentMsg = WhoCommand.buildRoomContent(this, defaultRoomName);
+//        RoomChangeCommand roomChangeCommand = new RoomChangeCommand(connection.getName(), "", defaultRoomName);
+//        String newClientMsg = gson.toJson(roomChangeCommand);
+//        this.sendToOneClient(roomLstMsg, connection);
+//        this.broadCastToCurrentRoom(connection, newClientMsg, null);
+//        this.sendToOneClient(roomContentMsg, connection);
+
+        JoinCommand j = new JoinCommand(defaultRoomName);
+        j.execute(connection);
+
     }
 
     public void removeClientConnection(ServerConnection connection){
@@ -76,7 +101,6 @@ public class ChatManager {
         for (ArrayList<ServerConnection> clients : this.chatRooms.values()){
             broadCastAGroup(clients,message, ignore );
         }
-
     }
 
     public void broadCastAGroup(ArrayList<ServerConnection> clients, String message, ServerConnection ignore){
@@ -112,7 +136,6 @@ public class ChatManager {
         return true;
     }
 
-
     public synchronized boolean joinRoom (ServerConnection s, String roomid){
         ArrayList<ServerConnection> newRoom = this.chatRooms.getOrDefault(roomid, null);
         // if the room to join exists
@@ -120,7 +143,9 @@ public class ChatManager {
             LOGGER.info("Client " +  s.getName() + " join the room " + roomid);
             String currentRoom = s.getCurrentChatRoom();
             ArrayList<ServerConnection> currentRoomClientList = this.chatRooms.get(currentRoom);
-            currentRoomClientList.remove(s);
+            if (currentRoomClientList != null) {
+                currentRoomClientList.remove(s);
+            }
             newRoom.add(s);
             s.setCurrentChatRoom(roomid);
             return true;
@@ -152,13 +177,83 @@ public class ChatManager {
         return identities;
     }
 
-    public HashMap<String, Integer> getRoomsInfo(){
+    public HashMap<String, Integer> getRoomsInfo(String ignore, String addition){
         HashMap<String, Integer> roomsInfo = new HashMap<>();
         synchronized (this.chatRooms){
             for (Map.Entry<String, ArrayList<ServerConnection>> entry : this.chatRooms.entrySet()){
-                roomsInfo.put(entry.getKey(), entry.getValue().size());
+                String roomid = entry.getKey();
+                if (!roomid.equals(ignore)){
+                    roomsInfo.put(entry.getKey(), entry.getValue().size());
+                }
             }
         }
+
+        if (addition != null){
+            roomsInfo.put(addition, 0);
+        }
+
         return roomsInfo;
     }
+
+    public synchronized boolean createRoom(ServerConnection s, String roomid){
+
+        if (Validator.isRoomIdValid(roomid) && !this.roomOwnership.containsKey(roomid)){
+            this.chatRooms.put(roomid, new ArrayList<>());
+            this.roomOwnership.put(roomid, s);
+            return true;
+        }
+        else{
+            return false;
+        }
+
+    }
+
+    //check if the room is valid and the owner is the input identity
+    private synchronized boolean isRoomOwner (ServerConnection identity, String roomid){
+        ServerConnection owner = this.roomOwnership.get(roomid);
+        if (owner == null){
+            return false;
+        }else{
+            return owner.getName().equals(identity.getName());
+        }
+    }
+
+    public boolean deleteRoom(ServerConnection s, String roomid){
+        if (isRoomOwner(s, roomid)){
+            ArrayList<ServerConnection> clientsInRoom;
+            synchronized (this.chatRooms) {
+                clientsInRoom = this.chatRooms.get(roomid);
+            }
+                if (clientsInRoom == null ){
+                    System.out.println("Delete fail because no such room exist ");
+                    return false;
+                }
+                // in order to prevent concurrency change to the array, make a shallow copy
+            ArrayList<ServerConnection> copiedClients = new ArrayList<ServerConnection>(clientsInRoom);
+            for(ServerConnection connection: copiedClients){
+                if (!connection.equals(s)){
+                    JoinCommand j = new JoinCommand(defaultRoomName);
+                    j.execute(connection);
+                }
+            }
+
+            synchronized (this.chatRooms) {
+                this.chatRooms.remove(roomid);
+            }
+            synchronized (this.roomOwnership){
+                this.roomOwnership.remove(roomid);
+            }
+            return true;
+        }
+        System.out.println("Delete fail because you are not an owner ");
+        return false;
+    }
+
+
+
+
+
+
+
+
 }

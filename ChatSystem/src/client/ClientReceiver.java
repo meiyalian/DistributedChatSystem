@@ -1,6 +1,7 @@
 package client;
 
 import client_command.ClientCommand;
+import client_command.RoomChangeCommand;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,7 +18,7 @@ public class ClientReceiver extends Thread{
     public ClientReceiver(ChatClient chatClient) throws IOException {
         this.chatClient = chatClient;
         this.socket = chatClient.getSocket();
-        this.commandFactory = new CommandFactory();
+        this.commandFactory = new CommandFactory(this.chatClient);
         this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF8"));
     }
 
@@ -39,6 +40,9 @@ public class ClientReceiver extends Thread{
                     ClientCommand command = commandFactory.convertServerMessageToCommand(str);
 //                    System.out.println("receive: " + str);
                     if (command != null){
+                        if (command instanceof RoomChangeCommand && ((RoomChangeCommand) command).getRoomid().equals("MainHall")){
+                            chatClient.setBundleMsg(true);
+                        }
                         command.execute(chatClient);
                     }
                 }
