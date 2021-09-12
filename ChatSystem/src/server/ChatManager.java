@@ -11,6 +11,8 @@ import java.util.logging.Logger;
  * managing clients (connections), joining room, changing room, etc.
  */
 public class ChatManager {
+    private ArrayList<ServerConnection> clientWaitForAckList;
+    private ArrayList<ServerConnection> clientConnectionList;
     private HashMap<String, ArrayList<ServerConnection>> chatRooms;// room list
     private HashMap<String, ServerConnection> roomOwnership;
     protected static String defaultRoomName = "MainHall";
@@ -18,10 +20,33 @@ public class ChatManager {
 
 
     public ChatManager(){
+        clientWaitForAckList = new ArrayList<>();
+        clientConnectionList = new ArrayList<>();
         chatRooms = new HashMap<>();
         roomOwnership= new HashMap<>();
         chatRooms.put(defaultRoomName, new ArrayList<>());
         roomOwnership.put(defaultRoomName, null); // main hall does not have owner
+    }
+
+    public synchronized ArrayList<ServerConnection> getClientConnectionList() {return clientConnectionList;}
+
+    public synchronized ArrayList<ServerConnection> getClientWaitForAckList(){
+        return this.clientWaitForAckList;
+    }
+
+    public synchronized void removeFromClientWaitForAckList(ServerConnection serverConnection){
+        clientWaitForAckList.remove(serverConnection);
+    }
+
+    public synchronized void resetClientWaitForAckList(){
+        clientWaitForAckList.clear();
+        for (ServerConnection serverConnection: clientConnectionList){
+            clientWaitForAckList.add(serverConnection);
+        }
+    }
+
+    public void addClientToConnectionList(ServerConnection connection){
+        clientConnectionList.add(connection);
     }
 
     public void addClientConnection(ServerConnection connection, String jsonMessage){
@@ -37,26 +62,38 @@ public class ChatManager {
     }
 
     public void removeClientConnection(ServerConnection connection){
+        synchronized (clientConnectionList){
+            clientConnectionList.remove(connection);
+        }
 
         String roomName = connection.getCurrentChatRoom();
         LOGGER.info("Remove " + connection.getName() + " from " + roomName);
 
         synchronized (this.chatRooms){
             ArrayList<ServerConnection> currentRoomClientList = this.chatRooms.get(roomName);
-            currentRoomClientList.remove(roomName);
+            if (!roomName.equals(ChatManager.defaultRoomName)){
+                currentRoomClientList.remove(roomName);
+            }
         }
 
         // if the room creator quit, set room owner to null
         synchronized (this.roomOwnership) {
-            if (this.roomOwnership.get(roomName).equals(connection)) {
-                this.roomOwnership.put(roomName, null);
+            ServerConnection room = this.roomOwnership.get(roomName);
+            if (room != null){
+                if (this.roomOwnership.get(roomName).equals(connection)) {
+                    this.roomOwnership.put(roomName, null);
+                }
             }
         }
+
         // get room owner
         ServerConnection currentOwner;
         synchronized (this.roomOwnership){
             currentOwner = this.roomOwnership.get(roomName);
         }
+
+        // client leave room
+        this.leaveRoom(connection, roomName);
 
         //discard the room when the following conditions applied:
         if (getRoomSize(roomName)== 0 && !roomName.equals(ChatManager.defaultRoomName) && currentOwner == null) {
@@ -74,7 +111,9 @@ public class ChatManager {
     public void broadCastAllRooms(String message, ServerConnection ignore){
         LOGGER.info("Broadcast msg to all rooms");
         for (ArrayList<ServerConnection> clients : this.chatRooms.values()){
-            broadCastAGroup(clients,message, ignore );
+            synchronized (clients){
+                broadCastAGroup(clients,message, ignore );
+            }
         }
 
     }
@@ -92,7 +131,7 @@ public class ChatManager {
 
     public void broadCastToCurrentRoom(ServerConnection s, String message ,ServerConnection ignore){
         String roomName = s.getCurrentChatRoom();
-        LOGGER.info("Broadcast msg to " +roomName );
+        LOGGER.info("Broadcast msg to " + roomName);
         broadCastAGroup(this.chatRooms.get(roomName), message,ignore);
     }
 
@@ -110,6 +149,15 @@ public class ChatManager {
             }
         }
         return true;
+    }
+
+    public synchronized void leaveRoom(ServerConnection s, String roomid){
+        // if the room to join exists
+        System.out.println("Client " +  s.getName() + " leave the room " + roomid);
+        String currentRoom = s.getCurrentChatRoom();
+        ArrayList<ServerConnection> currentRoomClientList = this.chatRooms.get(currentRoom);
+        currentRoomClientList.remove(s);
+        s.setCurrentChatRoom("");
     }
 
 

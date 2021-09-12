@@ -26,6 +26,10 @@ public class ServerConnection extends Thread {
         setName("");
     }
 
+    public Socket getSocket(){
+        return this.socket;
+    }
+
     public void setCurrentChatRoom(String currentChatRoom) {
         this.currentChatRoom = currentChatRoom;
     }
@@ -36,10 +40,11 @@ public class ServerConnection extends Thread {
 
     public ChatManager getChatManager(){return this.chatManager;}
 
-    private void executeCommand(String jsonMessage){
-
+    private void executeCommand(String jsonMessage) throws IOException {
         ServerCommand command = commandFactory.convertClientMessageToCommand(jsonMessage);
-        command.execute(this);
+        if (command != null){
+            command.execute(this);
+        }
     }
 
     @Override
@@ -49,7 +54,7 @@ public class ServerConnection extends Thread {
             try {
                 String jsonMessage = this.reader.readLine();
                 if (jsonMessage != null){
-                    System.out.println("receive: " + jsonMessage);
+//                    System.out.println("receive: " + jsonMessage);
                     executeCommand(jsonMessage);
                 }
             } catch (IOException e){

@@ -7,12 +7,16 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Options;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.net.Socket;
 
 public class ChatClient {
     private final Socket socket;
     private String identity = "";
+    private boolean connected = true;
     private String roomid = "MainHall";
+    private ClientSender clientSender = null;
+    private ClientReceiver clientReceiver = null;
     private static final int DEFAULT_PORT = 6379;
 
     public ChatClient(String hostname, int port) throws IOException {
@@ -76,17 +80,45 @@ public class ChatClient {
             e.printStackTrace();
         }
     }
-
     public void printPrefix() {
         System.out.print("[" + roomid + "] " + identity + "> ");
     }
 
     public void handle() throws IOException {
-        ClientSender clientSender = new ClientSender(socket, this);
-        ClientReceiver clientReceiver = new ClientReceiver(this);
+        try {
+            clientSender = new ClientSender(socket, this);
+            clientReceiver = new ClientReceiver(this);
 
-        clientSender.start();
-        clientReceiver.start();
+            clientSender.start();
+            clientReceiver.start();
+
+            while (connected){
+                Thread.sleep(2000);
+            }
+
+        } catch (InterruptedException e){
+            System.out.println("Connection is interrupted");
+            clientReceiver.close();
+            clientSender.close();
+        } finally {
+            if (socket != null){
+                System.out.println("Disconnected from localhost");
+                socket.close();
+            }
+        }
+
+    }
+
+    public void disconnect() throws IOException, InterruptedException {
+        if (clientReceiver != null){
+            System.out.println("receiver close called");
+            clientReceiver.setConnection_alive(false);
+        }
+//        if (clientSender != null){
+//            System.out.println("sender close called");
+//            clientSender.setConnection_alive(false);
+//        }
+        connected = false;
     }
 
     public void setRoomid(String roomid) {

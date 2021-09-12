@@ -18,8 +18,6 @@ public class RoomContentsCommand extends ClientCommand{
         this.owner = owner;
     }
 
-
-
     @Override
     public void execute(ChatClient chatClient) {
         StringBuilder print = new StringBuilder(roomId + " contains ");

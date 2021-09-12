@@ -30,6 +30,10 @@ public class WhoCommand extends ServerCommand{
     public static String buildRoomContent(ChatManager chatManager, String roomid){
         Gson gson = new Gson();
         String owner = chatManager.getRoomOwner(roomid);
+        /** when room owner gets disconnected, owner is set to an empty string */
+        if (owner == null){
+            owner = "";
+        }
         ArrayList<String> identities = chatManager.getRoomIdentities(roomid);
         RoomContentsCommand roomContentsCommand = new RoomContentsCommand(roomid, identities, owner);
         return gson.toJson(roomContentsCommand);
