@@ -11,6 +11,12 @@ import java.util.Arrays;
 
 public class CommandFactory {
     private final Gson gson = new Gson();
+    private ChatClient chatClient;
+
+
+    public CommandFactory(ChatClient chatClient) {
+        this.chatClient = chatClient;
+    }
 
     /**
      * Message can be in two formats:
@@ -31,6 +37,8 @@ public class CommandFactory {
      * @param userInput
      * @return
      */
+
+    // TODO: first char is not "#", treat as a message, Missing arguments shouldn't be tolerated - and you should report an error to the client.
     public ServerCommand convertUserInputToCommand(String userInput){
         String[] inputArray = userInput.split(" ");
         int inputLength = inputArray.length;
@@ -53,8 +61,11 @@ public class CommandFactory {
                 case "list":
                     return new ListCommand();
                 case "createroom":
+                    // mark the client is requesting to create a new room
+                    this.chatClient.requestNewRoom(arg);
                     return new CreateRoomCommand(arg);
                 case "delete":
+                    this.chatClient.requestDeleteRoom(arg);
                     return new DeleteCommand(arg);
                 case "message":
                     return new MessageCommand(arg);

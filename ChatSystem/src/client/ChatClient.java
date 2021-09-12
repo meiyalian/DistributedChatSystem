@@ -8,12 +8,24 @@ import org.apache.commons.cli.Options;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class ChatClient {
     private final Socket socket;
     private String identity = "";
     private String roomid = "MainHall";
     private static final int DEFAULT_PORT = 6379;
+    private String roomToCreate = null;
+    private String roomToDelete = null;
+    private boolean isBundleMsg = false;
+
+    public boolean isBundleMsg() {
+        return isBundleMsg;
+    }
+
+    public void setBundleMsg(boolean bundleMsg) {
+        isBundleMsg = bundleMsg;
+    }
 
     public ChatClient(String hostname, int port) throws IOException {
         this.socket = new Socket(hostname, port);
@@ -78,6 +90,7 @@ public class ChatClient {
     }
 
     public void printPrefix() {
+
         System.out.print("[" + roomid + "] " + identity + "> ");
     }
 
@@ -96,4 +109,30 @@ public class ChatClient {
     public String getRoomid() {
         return roomid;
     }
+
+    public void requestNewRoom(String roomid){
+        this.roomToCreate = roomid;
+    }
+
+    public void processNewRoomResponse(){
+        this.roomToCreate = null;
+    }
+
+    public String getRoomToCreate(){
+        return this.roomToCreate;
+    }
+
+
+    public String getRoomToDelete(){
+        return this.roomToDelete;
+    }
+
+    public void processRoomToDelete(){
+        this.roomToDelete = null;
+    }
+
+    public void requestDeleteRoom(String roomid){
+        this.roomToDelete = roomid;
+    }
+
 }

@@ -23,7 +23,7 @@ class ClientSender extends Thread{
         this.socket = soc;
         this.gson = new Gson();
         this.chatClient = chatClient;
-        this.commandFactory = new CommandFactory();
+        this.commandFactory = new CommandFactory(this.chatClient);
         this.userInput = new BufferedReader(new InputStreamReader(System.in));
 
         // autoFlush = true means send the data immediately when receiving the input
