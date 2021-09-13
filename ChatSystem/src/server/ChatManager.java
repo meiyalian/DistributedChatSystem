@@ -15,7 +15,7 @@ import java.util.logging.Logger;
  * managing clients (connections), joining room, changing room, etc.
  */
 
-//TODO: If any room other than MainHall has an em p t y owner and becomes em p t y ( i.e. has no contents ) then the room is deleted immediatel y .
+//TODO: If any room other than MainHall has an empty owner and becomes empty ( i.e. has no contents ) then the room is deleted immediately .
 public class ChatManager {
     private ArrayList<ServerConnection> clientWaitForAckList;
     private ArrayList<ServerConnection> clientConnectionList;

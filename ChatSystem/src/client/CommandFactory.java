@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import server_command.*;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -28,9 +29,8 @@ public class CommandFactory {
      * @param inputArray
      * @return
      */
-    private String joinMultipleArguments(String[] inputArray){
-        ArrayList<String> arrayList = new ArrayList<>(Arrays.asList(inputArray));
-        return String.join(" ", arrayList.subList(1, arrayList.size()));
+    private String joinMultipleArguments(ArrayList<String> inputArray){
+        return String.join(" ", inputArray.subList(1, inputArray.size()));
     }
 
     /**
@@ -40,16 +40,23 @@ public class CommandFactory {
      * @return
      */
 
-    // TODO: first char is not "#", treat as a message, Missing arguments shouldn't be tolerated - and you should report an error to the client.
     public ServerCommand convertUserInputToCommand(String userInput){
-        String[] inputArray = userInput.split(" ");
-        int inputLength = inputArray.length;
+        String[] userInputs = userInput.split(" ");
+        ArrayList<String> inputArray = new ArrayList<>();
+
+        /** remove the empty spaces before the first input */
+        for (String input: userInputs){
+            if (input.length() > 0){
+                inputArray.add(input);
+            }
+        }
+        int inputLength = inputArray.size();
 
         if (inputLength != 0){
 
             /** if the command does not start with #, treat it as normal message */
-            String prefix = inputArray[0].substring(0,1);
-            String type = inputArray[0].substring(1);
+            String prefix = inputArray.get(0).substring(0,1);
+            String type = inputArray.get(0).substring(1);
 
             if (!prefix.equals("#")){
                 return new MessageCommand(userInput);

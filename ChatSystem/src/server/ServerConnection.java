@@ -65,7 +65,6 @@ public class ServerConnection extends Thread {
         close();
     }
 
-    //Todo: leave chatroom
     private void leave(ServerConnection connection) {
         chatManager.removeClientConnection(connection);
     }
