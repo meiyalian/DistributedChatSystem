@@ -7,7 +7,6 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Options;
 
 import java.io.IOException;
-import java.io.InterruptedIOException;
 import java.net.Socket;
 
 public class ChatClient {
@@ -109,7 +108,7 @@ public class ChatClient {
 
     }
 
-    public void disconnect() throws IOException, InterruptedException {
+    public void disconnect() {
         if (clientReceiver != null){
             clientReceiver.setConnection_alive(false);
         }
