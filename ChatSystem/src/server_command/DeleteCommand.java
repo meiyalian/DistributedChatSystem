@@ -17,17 +17,17 @@ public class DeleteCommand extends ServerCommand{
         String jsonMessage;
         if (chatManager.deleteRoom(serverConnection, roomid)){
             jsonMessage = ListCommand.buildRoomList(chatManager,null, null);
+            System.out.println("Send: " + jsonMessage);
 
             // the server will send a delete msg to the owner first, then move the owner to the main hall
             if (serverConnection.getCurrentChatRoom().equals(roomid)){
                 JoinCommand j = new JoinCommand("MainHall");
                 j.execute(serverConnection);
             }
-
-
             System.out.println("delete successfully ");
         }else{
             jsonMessage = ListCommand.buildRoomList(chatManager,null, this.roomid );
+            System.out.println("Send: " + jsonMessage);
             System.out.println("delete  unsuccessfully ");
         }
         chatManager.sendToOneClient(jsonMessage, serverConnection);

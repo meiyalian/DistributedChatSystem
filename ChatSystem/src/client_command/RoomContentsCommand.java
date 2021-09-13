@@ -24,20 +24,27 @@ public class RoomContentsCommand extends ClientCommand{
 
         // if room not exist, no response
         if (this.owner.equals("") && !this.roomId.equals("MainHall")){
-            return;
+            if (identities.size() == 0){
+                return;
+            } else {
+                for(String str: identities){
+                    print.append(str).append(" ");
+                }
+            }
         }
-
         // if no one in the room, displays "room is empty"
-        if (identities.size() == 0 ){
+        else if (identities.size() == 0 ){
             System.out.println(roomId + " is empty.");
             return;
         }
-        //otherwise, display the room information
-        for(String str: identities){
-            if (str.equals(owner)){
-                print.append("*").append(str).append(" ");
-            }else{
-                print.append(str).append(" ");
+        else {
+            //otherwise, display the room information
+            for(String str: identities){
+                if (str.equals(owner)){
+                    print.append("*").append(str).append(" ");
+                }else{
+                    print.append(str).append(" ");
+                }
             }
         }
         System.out.println(print);

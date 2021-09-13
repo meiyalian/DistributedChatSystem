@@ -20,6 +20,7 @@ public class CreateRoomCommand extends ServerCommand{
         }else{
             jsonMessage = ListCommand.buildRoomList(chatManager,this.roomid , null);
         }
+        System.out.println("Send: " + jsonMessage);
         chatManager.sendToOneClient(jsonMessage, serverConnection);
 
 

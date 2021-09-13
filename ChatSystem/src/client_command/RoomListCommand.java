@@ -15,7 +15,6 @@ public class RoomListCommand extends ClientCommand{
     public RoomListCommand(HashMap<String, Integer> info) {
         for (Map.Entry<String, Integer> entry : info.entrySet()){
             this.rooms.add(new RoomInfo(entry.getKey(), entry.getValue()));
-            System.out.println();
         }
     }
 
@@ -87,9 +86,5 @@ public class RoomListCommand extends ClientCommand{
             return count;
         }
     }
-
-
-
-
 
 }
