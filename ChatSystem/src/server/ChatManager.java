@@ -1,33 +1,23 @@
 package server;
 
-import client_command.RoomChangeCommand;
-import client_command.RoomContentsCommand;
-import client_command.RoomListCommand;
 import com.google.gson.Gson;
 import server_command.JoinCommand;
-import server_command.ListCommand;
-import server_command.WhoCommand;
 import shared.Validator;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
-
 
 /**
  * ChatManager class is responsible for performing admin tasks including:
  * managing clients (connections), joining room, changing room, etc.
  */
-
 //TODO: If any room other than MainHall has an em p t y owner and becomes em p t y ( i.e. has no contents ) then the room is deleted immediatel y .
 public class ChatManager {
     private HashMap<String, ArrayList<ServerConnection>> chatRooms;// room list
     private HashMap<String, ServerConnection> roomOwnership;
     protected static String defaultRoomName = "MainHall";
     public static final Logger LOGGER = Logger.getLogger(ChatServer.class.getName());
-    private Gson gson;
 
 
     public ChatManager(){
@@ -35,7 +25,7 @@ public class ChatManager {
         roomOwnership= new HashMap<>();
         chatRooms.put(defaultRoomName, new ArrayList<>());
         roomOwnership.put(defaultRoomName, null); // main hall does not have owner
-        gson =  new Gson();
+
     }
 
     public void addClientConnection(ServerConnection connection, String jsonMessage){
@@ -147,7 +137,7 @@ public class ChatManager {
                 currentRoomClientList.remove(s);
             }
             newRoom.add(s);
-            s.setCurrentChatRoom(roomid);
+
             return true;
         }
         return false;
