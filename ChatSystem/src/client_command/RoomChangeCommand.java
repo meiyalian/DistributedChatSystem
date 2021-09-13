@@ -20,8 +20,21 @@ public class RoomChangeCommand extends ClientCommand{
 
     @Override
     public void execute(ChatClient chatClient) {
-
-        if(!former.equals(roomid)){
+        // server sends RoomChange event with empty roomid to indicate that client is disconnecting
+        if (roomid.equals("")) {
+            if (identity.equals(chatClient.getIdentity())){
+                try {
+                    System.out.println("\n" + identity + " leaves " + chatClient.getRoomid());
+                    chatClient.disconnect();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return;
+            }
+            else {
+                System.out.println("\n" + identity + " leaves " + chatClient.getRoomid());
+            }
+        } else if (!former.equals(roomid)){
             if (identity.equals(chatClient.getIdentity())){
                 chatClient.setRoomid(roomid);
             }

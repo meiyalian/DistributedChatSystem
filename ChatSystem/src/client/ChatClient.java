@@ -13,7 +13,10 @@ import java.util.ArrayList;
 public class ChatClient {
     private final Socket socket;
     private String identity = "";
+    private boolean connected = true;
     private String roomid = "MainHall";
+    private ClientSender clientSender = null;
+    private ClientReceiver clientReceiver = null;
     private static final int DEFAULT_PORT = 6379;
     private String roomToCreate = null;
     private String roomToDelete = null;
@@ -88,18 +91,41 @@ public class ChatClient {
             e.printStackTrace();
         }
     }
-
     public void printPrefix() {
 
         System.out.print("[" + roomid + "] " + identity + "> ");
     }
 
     public void handle() throws IOException {
-        ClientSender clientSender = new ClientSender(socket, this);
-        ClientReceiver clientReceiver = new ClientReceiver(this);
+        try {
+            clientSender = new ClientSender(socket, this);
+            clientReceiver = new ClientReceiver(this);
 
-        clientSender.start();
-        clientReceiver.start();
+            clientSender.start();
+            clientReceiver.start();
+
+            while (connected){
+                Thread.sleep(2000);
+            }
+
+        } catch (InterruptedException e){
+            System.out.println("Connection is interrupted");
+            clientReceiver.close();
+            clientSender.close();
+        } finally {
+            if (socket != null){
+                System.out.println("Disconnected from localhost");
+                socket.close();
+            }
+        }
+
+    }
+
+    public void disconnect() {
+        if (clientReceiver != null){
+            clientReceiver.setConnection_alive(false);
+        }
+        connected = false;
     }
 
     public void setRoomid(String roomid) {

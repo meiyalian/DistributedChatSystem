@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import server_command.*;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -12,9 +13,11 @@ import java.util.Arrays;
 public class CommandFactory {
     private final Gson gson = new Gson();
     private ChatClient chatClient;
+    private final ArrayList<String> commandRequiresNoInput = new ArrayList<>();
 
-
-    public CommandFactory(ChatClient chatClient) {
+    public CommandFactory(ChatClient chatClient){
+        this.commandRequiresNoInput.add("list");
+        this.commandRequiresNoInput.add("quit");
         this.chatClient = chatClient;
     }
 
@@ -26,9 +29,8 @@ public class CommandFactory {
      * @param inputArray
      * @return
      */
-    private String joinMultipleArguments(String[] inputArray){
-        ArrayList<String> arrayList = new ArrayList<>(Arrays.asList(inputArray));
-        return String.join(" ", arrayList.subList(1, arrayList.size()));
+    private String joinMultipleArguments(ArrayList<String> inputArray){
+        return String.join(" ", inputArray.subList(1, inputArray.size()));
     }
 
     /**
@@ -38,14 +40,34 @@ public class CommandFactory {
      * @return
      */
 
-    // TODO: first char is not "#", treat as a message, Missing arguments shouldn't be tolerated - and you should report an error to the client.
     public ServerCommand convertUserInputToCommand(String userInput){
-        String[] inputArray = userInput.split(" ");
-        int inputLength = inputArray.length;
+        String[] userInputs = userInput.split(" ");
+        ArrayList<String> inputArray = new ArrayList<>();
+
+        /** remove the empty spaces before the first input */
+        for (String input: userInputs){
+            if (input.length() > 0){
+                inputArray.add(input);
+            }
+        }
+        int inputLength = inputArray.size();
 
         if (inputLength != 0){
-            // remove the # at the beginning
-            String type = inputArray[0].substring(1);
+
+            /** if the command does not start with #, treat it as normal message */
+            String prefix = inputArray.get(0).substring(0,1);
+            String type = inputArray.get(0).substring(1);
+
+            if (!prefix.equals("#")){
+                return new MessageCommand(userInput);
+            } else {
+                if (!this.commandRequiresNoInput.contains(type) && inputLength == 1){
+                    System.out.println("Command " + userInput + " is invalid.");
+                    return null;
+                }
+
+            }
+
             String arg = "";
             if (inputLength > 1){
                 arg = this.joinMultipleArguments(inputArray);
@@ -73,7 +95,8 @@ public class CommandFactory {
                     return new QuitCommand();
                 default:
                     // a normal message, not command
-                    return new MessageCommand(userInput);
+                    System.out.println("Command " + userInput + " is invalid.");
+                    return null;
             }
         }
         // if user doesn't input anything
