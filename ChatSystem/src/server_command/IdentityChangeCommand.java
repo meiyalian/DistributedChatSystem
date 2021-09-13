@@ -34,7 +34,6 @@ public class IdentityChangeCommand extends ServerCommand {
         String newID = identity;
         ChatManager chatManager = serverConnection.getChatManager();
 
-
         if (isIdentityInvalid(identity) || !chatManager.isUniqueIdentity(identity) ){
             newID = formerID;
         }

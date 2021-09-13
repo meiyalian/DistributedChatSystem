@@ -24,6 +24,7 @@ public class ServerConnection extends Thread {
         this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         this.writer = new PrintWriter(socket.getOutputStream());
         setName("");
+        setCurrentChatRoom("");
     }
 
     public Socket getSocket(){

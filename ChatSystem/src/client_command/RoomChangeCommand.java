@@ -14,6 +14,10 @@ public class RoomChangeCommand extends ClientCommand{
         this.roomid   = roomid;
     }
 
+    public String getRoomid() {
+        return roomid;
+    }
+
     @Override
     public void execute(ChatClient chatClient) {
         // server sends RoomChange event with empty roomid to indicate that client is disconnecting
@@ -34,11 +38,18 @@ public class RoomChangeCommand extends ClientCommand{
             if (identity.equals(chatClient.getIdentity())){
                 chatClient.setRoomid(roomid);
             }
-            System.out.println(identity + " moved from " + former + " to " + roomid);
-        } else{
-            System.out.println("The requested room is invalid or non existent");
+            if (former.equals("")){
+                System.out.println( identity + " moves to " + roomid);
+            }else{
+                System.out.println(identity + " moved from " + former + " to " + roomid);
+            }
+
+        }else{
+            System.out.println("\nThe requested room is invalid or non existent");
         }
 
-        chatClient.printPrefix();
+        if (!chatClient.isBundleMsg()){
+            chatClient.printPrefix();
+        }
     }
 }

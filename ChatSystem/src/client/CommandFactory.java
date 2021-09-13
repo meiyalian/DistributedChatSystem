@@ -3,7 +3,6 @@ package client;
 import client_command.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import org.apache.commons.cli.CommandLineParser;
 import server_command.*;
 
 import java.util.ArrayList;
@@ -12,11 +11,13 @@ import java.util.Arrays;
 
 public class CommandFactory {
     private final Gson gson = new Gson();
+    private ChatClient chatClient;
     private final ArrayList<String> commandRequiresNoInput = new ArrayList<>();
 
-    public CommandFactory(){
+    public CommandFactory(ChatClient chatClient){
         this.commandRequiresNoInput.add("list");
         this.commandRequiresNoInput.add("quit");
+        this.chatClient = chatClient;
     }
 
     /**
@@ -38,6 +39,8 @@ public class CommandFactory {
      * @param userInput
      * @return
      */
+
+    // TODO: first char is not "#", treat as a message, Missing arguments shouldn't be tolerated - and you should report an error to the client.
     public ServerCommand convertUserInputToCommand(String userInput){
         String[] inputArray = userInput.split(" ");
         int inputLength = inputArray.length;
@@ -63,7 +66,6 @@ public class CommandFactory {
                 arg = this.joinMultipleArguments(inputArray);
             }
 
-
             switch(type){
                 case "identitychange":
                     return new IdentityChangeCommand(arg);
@@ -74,8 +76,11 @@ public class CommandFactory {
                 case "list":
                     return new ListCommand();
                 case "createroom":
+                    // mark the client is requesting to create a new room
+                    this.chatClient.requestNewRoom(arg);
                     return new CreateRoomCommand(arg);
                 case "delete":
+                    this.chatClient.requestDeleteRoom(arg);
                     return new DeleteCommand(arg);
                 case "message":
                     return new MessageCommand(arg);

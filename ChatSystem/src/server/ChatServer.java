@@ -80,7 +80,6 @@ public class ChatServer {
     private synchronized String autoGenerateIdentity(){
         String identity = "guest" + identityCount;
         identityCount += 1;
-
         while (isIdentityInList(identity)){
             identity = "guest" + identityCount;
             identityCount += 1;
