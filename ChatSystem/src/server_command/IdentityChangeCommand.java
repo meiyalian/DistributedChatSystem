@@ -48,6 +48,8 @@ public class IdentityChangeCommand extends ServerCommand {
          * - server responds NewIdentity message to all currently connected clients in the same room
          */
         String jsonMessage = gson.toJson(newIdentityCommand);
+        System.out.println("Send: " + jsonMessage);
+
         if (newID.equals(formerID)){
             chatManager.sendToOneClient(jsonMessage, serverConnection);
         } else {

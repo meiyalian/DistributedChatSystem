@@ -1,6 +1,5 @@
 package server_command;
 
-import client_command.RoomChangeCommand;
 import client_command.RoomContentsCommand;
 import com.google.gson.Gson;
 import server.ChatManager;
@@ -20,7 +19,9 @@ public class WhoCommand extends ServerCommand{
     public void execute(ServerConnection serverConnection) {
 
         ChatManager chatManager = serverConnection.getChatManager();
+        chatManager.removeEmptyRoomWithOwnerDropped();
         String jsonMessage = buildRoomContent(chatManager, roomid);
+        System.out.println("Send: " + jsonMessage);
         chatManager.sendToOneClient(jsonMessage, serverConnection);
     }
 

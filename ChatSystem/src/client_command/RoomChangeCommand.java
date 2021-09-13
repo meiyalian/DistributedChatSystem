@@ -24,7 +24,7 @@ public class RoomChangeCommand extends ClientCommand{
         if (roomid.equals("")) {
             if (identity.equals(chatClient.getIdentity())){
                 try {
-                    System.out.println("\n" + identity + " leaves " + chatClient.getRoomid());
+                    System.out.println(identity + " leaves " + chatClient.getRoomid());
                     chatClient.disconnect();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -32,7 +32,7 @@ public class RoomChangeCommand extends ClientCommand{
                 return;
             }
             else {
-                System.out.println("\n" + identity + " leaves " + chatClient.getRoomid());
+                System.out.println(identity + " leaves " + chatClient.getRoomid());
             }
         } else if (!former.equals(roomid)){
             if (identity.equals(chatClient.getIdentity())){

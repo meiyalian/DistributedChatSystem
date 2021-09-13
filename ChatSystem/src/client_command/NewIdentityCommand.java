@@ -21,20 +21,23 @@ public class NewIdentityCommand extends ClientCommand {
     public void execute(ChatClient chatClient) {
 
         boolean firstTimeConnection = former.equals("");
+        String str;
 
         if (firstTimeConnection){
             chatClient.setIdentity(identity);
-            System.out.println("Connected to localhost as " + identity);
+            str = "Connected to localhost as " + identity;
         } else if (former.equals(identity)) {
-            System.out.println("Requested identity invalid or in use");
+            str = "Requested identity invalid or in use";
         } else if (former.equals(chatClient.getIdentity())) {
             // if former is equal to chatClient identity, this means that this client has changed the identity
             chatClient.setIdentity(identity);
-            System.out.println(former + " is now " + identity);
+            str = former + " is now " + identity;
         } else {
             // if former is not equal to chatClient identity, this means that another client has changed the identity
-            System.out.println( former + " is now " + identity);
+            str = former + " is now " + identity;
         }
+
+        System.out.println(str);
 
         if (!firstTimeConnection){
             chatClient.printPrefix();

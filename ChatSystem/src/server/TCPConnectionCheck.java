@@ -38,11 +38,10 @@ public class TCPConnectionCheck extends Thread{
         }
         this.waiting = true;
         while (waiting){
-            Thread.sleep(5000);
+            Thread.sleep(3000);
             ArrayList<ServerConnection> clientWaitForAckConnections = chatManager.getClientWaitForAckList();
             synchronized (clientWaitForAckConnections){
                 for (ServerConnection serverConnection: clientWaitForAckConnections){
-                    System.out.println("quit command for serverConnection " + serverConnection);
                     synchronized (serverConnection){
                         QuitCommand quitCommand = new QuitCommand();
                         quitCommand.execute(serverConnection);
@@ -58,7 +57,6 @@ public class TCPConnectionCheck extends Thread{
         while (tcpCheckFlag){
             try {
                 Thread.sleep(5000);
-                System.out.println("check connection");
                 checkConnection();
             } catch (InterruptedException e) {
                 e.printStackTrace();

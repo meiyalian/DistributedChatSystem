@@ -15,7 +15,6 @@ import java.util.logging.Logger;
  * managing clients (connections), joining room, changing room, etc.
  */
 
-//TODO: If any room other than MainHall has an empty owner and becomes empty ( i.e. has no contents ) then the room is deleted immediately .
 public class ChatManager {
     private ArrayList<ServerConnection> clientWaitForAckList;
     private ArrayList<ServerConnection> clientConnectionList;
@@ -68,6 +67,26 @@ public class ChatManager {
 
     }
 
+    public void removeEmptyRoomWithOwnerDropped(){
+        ArrayList<String> roomsToBeRemoved = new ArrayList<>();
+        synchronized (this.roomOwnership) {
+            for (Map.Entry<String, ServerConnection> roomOwner : this.roomOwnership.entrySet()) {
+                ServerConnection roomValue = roomOwner.getValue();
+                String roomKey = roomOwner.getKey();
+                if (getRoomSize(roomKey) == 0 && !roomKey.equals(ChatManager.defaultRoomName) && roomValue == null){
+                    LOGGER.info("Remove room " +  roomKey);
+                    synchronized (this.chatRooms){
+                        this.chatRooms.remove(roomKey); // remove room
+                    }
+                    roomsToBeRemoved.add(roomKey);
+                }
+            }
+            for (String room: roomsToBeRemoved){
+                this.roomOwnership.remove(room); // remove the ownership since the room is removed
+            }
+        }
+    }
+
     public void removeClientConnection(ServerConnection connection){
         synchronized (clientConnectionList){
             clientConnectionList.remove(connection);
@@ -83,12 +102,14 @@ public class ChatManager {
             }
         }
 
-        // if the room creator quit, set room owner to null
+        // if the room creator quit, set room owner to null for all rooms that owner owned
         synchronized (this.roomOwnership) {
-            ServerConnection room = this.roomOwnership.get(roomName);
-            if (room != null){
-                if (this.roomOwnership.get(roomName).equals(connection)) {
-                    this.roomOwnership.put(roomName, null);
+            for (Map.Entry<String, ServerConnection> roomOwner : this.roomOwnership.entrySet()) {
+                ServerConnection room = roomOwner.getValue();
+                if (room != null){
+                    if (room.equals(connection)) {
+                        roomOwner.setValue(null);
+                    }
                 }
             }
         }
@@ -103,20 +124,20 @@ public class ChatManager {
         this.leaveRoom(connection, roomName);
 
         //discard the room when the following conditions applied:
-        if (getRoomSize(roomName)== 0 && !roomName.equals(ChatManager.defaultRoomName) && currentOwner == null) {
-            LOGGER.info("Remove room " +  roomName);
-            synchronized (this.chatRooms){
-                this.chatRooms.remove(roomName); // remove room
-            }
-            synchronized (this.roomOwnership){
-                this.roomOwnership.remove(roomName); // remove the ownership infor since the room is removed
-            }
-        }
+        removeEmptyRoomWithOwnerDropped();
+//        if (getRoomSize(roomName)== 0 && !roomName.equals(ChatManager.defaultRoomName) && currentOwner == null) {
+//            LOGGER.info("Remove room " +  roomName);
+//            synchronized (this.chatRooms){
+//                this.chatRooms.remove(roomName); // remove room
+//            }
+//            synchronized (this.roomOwnership){
+//                this.roomOwnership.remove(roomName); // remove the ownership since the room is removed
+//            }
+//        }
 
     }
 
     public void broadCastAllRooms(String message, ServerConnection ignore){
-        LOGGER.info("Broadcast msg to all rooms");
         for (ArrayList<ServerConnection> clients : this.chatRooms.values()){
             synchronized (clients){
                 broadCastAGroup(clients,message, ignore );
@@ -137,12 +158,12 @@ public class ChatManager {
 
     public void broadCastToCurrentRoom(ServerConnection s, String message ,ServerConnection ignore){
         String roomName = s.getCurrentChatRoom();
-        LOGGER.info("Broadcast msg to " + roomName);
+//        LOGGER.info("Broadcast msg to " + roomName);
         broadCastAGroup(this.chatRooms.get(roomName), message,ignore);
     }
 
     public void sendToOneClient(String message, ServerConnection serverConnection){
-        LOGGER.info("Send msg to " +  serverConnection.getName());
+//        LOGGER.info("Send msg to " +  serverConnection.getName());
         serverConnection.sendMessage(message);
     }
 
@@ -197,7 +218,7 @@ public class ChatManager {
     }
 
     public synchronized ArrayList<String> getRoomIdentities(String roomid){
-        LOGGER.info("Client requests " + roomid + " identities");
+//        LOGGER.info("Client requests " + roomid + " identities");
         ArrayList<String> identities = new ArrayList<>();
         ArrayList<ServerConnection> clientsInRoom = this.chatRooms.getOrDefault(roomid, null);
         if (clientsInRoom != null){

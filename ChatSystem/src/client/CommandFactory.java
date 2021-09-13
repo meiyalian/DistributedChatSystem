@@ -5,9 +5,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import server_command.*;
 
-import java.lang.reflect.Array;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 
 public class CommandFactory {
@@ -94,13 +93,16 @@ public class CommandFactory {
                 case "quit":
                     return new QuitCommand();
                 default:
-                    // a normal message, not command
                     System.out.println("Command " + userInput + " is invalid.");
                     return null;
             }
         }
         // if user doesn't input anything
         return new MessageCommand("");
+    }
+
+    private ClientCommand generateCommand(String jsonMessage, Class commandClass){
+        return this.gson.fromJson(jsonMessage, (Type) commandClass);
     }
 
     /**
@@ -112,16 +114,16 @@ public class CommandFactory {
         String type = gson.fromJson(jsonMessage, JsonObject.class).get("type").getAsString();
 
         switch(type){
-            case "message":
-                return gson.fromJson(jsonMessage, MessageRelayCommand.class);
             case "newidentity":
-                return gson.fromJson(jsonMessage, NewIdentityCommand.class);
+                return this.generateCommand(jsonMessage, NewIdentityCommand.class);
+            case "message":
+                return this.generateCommand(jsonMessage, MessageRelayCommand.class);
             case "roomchange":
-                return gson.fromJson(jsonMessage, RoomChangeCommand.class);
+                return this.generateCommand(jsonMessage, RoomChangeCommand.class);
             case "roomcontents":
-                return gson.fromJson(jsonMessage, RoomContentsCommand.class);
+                return this.generateCommand(jsonMessage, RoomContentsCommand.class);
             case "roomlist":
-                return gson.fromJson(jsonMessage, RoomListCommand.class);
+                return this.generateCommand(jsonMessage, RoomListCommand.class);
             default:
                 return null;
         }

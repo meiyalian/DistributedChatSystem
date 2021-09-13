@@ -14,16 +14,17 @@ public class ListCommand extends ServerCommand{
     @Override
     public void execute(ServerConnection serverConnection) {
         ChatManager chatManager = serverConnection.getChatManager();
-        chatManager.sendToOneClient(buildRoomList(chatManager, null, null), serverConnection);
+        String roomList = buildRoomList(chatManager, null, null);
+        System.out.println("Send: " + roomList);
+        chatManager.sendToOneClient(roomList, serverConnection);
 
     }
 
     public static String buildRoomList(ChatManager chatManager, String ignore, String addition){
         Gson gson = new Gson();
+        chatManager.removeEmptyRoomWithOwnerDropped();
 
         RoomListCommand roomListCommand = new RoomListCommand(chatManager.getRoomsInfo(ignore, addition));
         return gson.toJson(roomListCommand);
-
-
     }
 }

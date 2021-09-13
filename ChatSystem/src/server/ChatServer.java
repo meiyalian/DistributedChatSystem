@@ -48,7 +48,6 @@ public class ChatServer {
             }
         } catch (ParseException e){
             e.printStackTrace();
-            System.out.println("Default port " + DEFAULT_PORT + " will be used.");
             port = DEFAULT_PORT;
         }
 

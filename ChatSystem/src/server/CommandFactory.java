@@ -4,8 +4,14 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import server_command.*;
 
+import java.lang.reflect.Type;
+
 public class CommandFactory {
     private final Gson gson;
+
+    private ServerCommand generateCommand(String jsonMessage, Class commandClass){
+        return this.gson.fromJson(jsonMessage, (Type) commandClass);
+    }
 
     public CommandFactory(){
         this.gson = new Gson();
@@ -17,26 +23,30 @@ public class CommandFactory {
      * @return
      */
     public ServerCommand convertClientMessageToCommand(String jsonMessage){
-        String type = gson.fromJson(jsonMessage, JsonObject.class).get("type").getAsString();
+        String type = this.gson.fromJson(jsonMessage, JsonObject.class).get("type").getAsString();
+        if (!type.equals("ack")){
+            System.out.println("Received: " + jsonMessage);
+        }
+
         switch(type){
             case "ack":
-                return this.gson.fromJson(jsonMessage, ReceiveAckCommand.class);
+                return this.generateCommand(jsonMessage, ReceiveAckCommand.class);
             case "identitychange":
-                return this.gson.fromJson(jsonMessage, IdentityChangeCommand.class);
-            case "join":
-                return this.gson.fromJson(jsonMessage, JoinCommand.class);
-            case "who":
-                return this.gson.fromJson(jsonMessage, WhoCommand.class);
-            case "list":
-                return this.gson.fromJson(jsonMessage, ListCommand.class);
-            case "createroom":
-                return this.gson.fromJson(jsonMessage, CreateRoomCommand.class);
-            case "delete":
-                return this.gson.fromJson(jsonMessage, DeleteCommand.class);
+                return this.generateCommand(jsonMessage, IdentityChangeCommand.class);
             case "message":
-                return this.gson.fromJson(jsonMessage, MessageCommand.class);
+                return this.generateCommand(jsonMessage, MessageCommand.class);
+            case "createroom":
+                return this.generateCommand(jsonMessage, CreateRoomCommand.class);
+            case "join":
+                return this.generateCommand(jsonMessage, JoinCommand.class);
+            case "who":
+                return this.generateCommand(jsonMessage, WhoCommand.class);
+            case "list":
+                return this.generateCommand(jsonMessage, ListCommand.class);
+            case "delete":
+                return this.generateCommand(jsonMessage, DeleteCommand.class);
             case "quit":
-                return this.gson.fromJson(jsonMessage, QuitCommand.class);
+                return this.generateCommand(jsonMessage, QuitCommand.class);
             default:
                 return null;
         }
