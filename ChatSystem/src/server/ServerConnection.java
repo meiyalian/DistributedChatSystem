@@ -73,7 +73,6 @@ public class ServerConnection extends Thread {
                 connection_alive = false;
                 QuitCommand quitCommand = new QuitCommand();
                 quitCommand.execute(this);
-                e.printStackTrace();
             }
         }
         close();

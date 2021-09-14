@@ -2,7 +2,6 @@ package server;
 
 import com.google.gson.Gson;
 import server_command.JoinCommand;
-import server_command.ServerCommand;
 import shared.Validator;
 
 import java.util.ArrayList;
@@ -87,10 +86,8 @@ public class ChatManager {
 
         synchronized (this.chatRooms){
             ArrayList<ServerConnection> currentRoomClientList = this.chatRooms.get(roomName);
-            if (!roomName.equals(ChatManager.defaultRoomName)){
-                if (currentRoomClientList != null){
-                    currentRoomClientList.remove(roomName);
-                }
+            if (currentRoomClientList != null){
+                currentRoomClientList.remove(roomName);
             }
         }
 
