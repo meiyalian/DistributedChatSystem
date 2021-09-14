@@ -44,8 +44,10 @@ public class ClientReceiver extends Thread{
         while (connection_alive) {
             try {
                 String str = reader.readLine();
-
-                if (str != null){
+                if (str == null){
+                    System.out.println("\nWARNING: Server has closed the connection!");
+                    this.connection_alive = false;
+                } else {
                     ClientCommand command = commandFactory.convertServerMessageToCommand(str);
 //                    System.out.println("receive: " + str);
                     if (command != null){
