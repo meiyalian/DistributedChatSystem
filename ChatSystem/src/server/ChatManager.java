@@ -2,6 +2,7 @@ package server;
 
 import com.google.gson.Gson;
 import server_command.JoinCommand;
+import server_command.ServerCommand;
 import shared.Validator;
 
 import java.util.ArrayList;
@@ -16,7 +17,6 @@ import java.util.logging.Logger;
  */
 
 public class ChatManager {
-    private ArrayList<ServerConnection> clientWaitForAckList;
     private ArrayList<ServerConnection> clientConnectionList;
     private HashMap<String, ArrayList<ServerConnection>> chatRooms;// room list
     private HashMap<String, ServerConnection> roomOwnership;
@@ -26,7 +26,7 @@ public class ChatManager {
 
 
     public ChatManager(){
-        clientWaitForAckList = new ArrayList<>();
+//        this.createDefaultRoom();
         clientConnectionList = new ArrayList<>();
         chatRooms = new HashMap<>();
         roomOwnership= new HashMap<>();
@@ -37,23 +37,13 @@ public class ChatManager {
 
     public synchronized ArrayList<ServerConnection> getClientConnectionList() {return clientConnectionList;}
 
-    public synchronized ArrayList<ServerConnection> getClientWaitForAckList(){
-        return this.clientWaitForAckList;
-    }
-
-    public synchronized void removeFromClientWaitForAckList(ServerConnection serverConnection){
-        clientWaitForAckList.remove(serverConnection);
-    }
-
-    public synchronized void resetClientWaitForAckList(){
-        clientWaitForAckList.clear();
-        for (ServerConnection serverConnection: clientConnectionList){
-            clientWaitForAckList.add(serverConnection);
-        }
-    }
 
     public void addClientToConnectionList(ServerConnection connection){
         clientConnectionList.add(connection);
+    }
+
+    public boolean isClientInConnectionList(ServerConnection connection){
+        return clientConnectionList.contains(connection);
     }
 
     public void addClientConnection(ServerConnection connection, String jsonMessage){
@@ -98,7 +88,9 @@ public class ChatManager {
         synchronized (this.chatRooms){
             ArrayList<ServerConnection> currentRoomClientList = this.chatRooms.get(roomName);
             if (!roomName.equals(ChatManager.defaultRoomName)){
-                currentRoomClientList.remove(roomName);
+                if (currentRoomClientList != null){
+                    currentRoomClientList.remove(roomName);
+                }
             }
         }
 
@@ -125,15 +117,6 @@ public class ChatManager {
 
         //discard the room when the following conditions applied:
         removeEmptyRoomWithOwnerDropped();
-//        if (getRoomSize(roomName)== 0 && !roomName.equals(ChatManager.defaultRoomName) && currentOwner == null) {
-//            LOGGER.info("Remove room " +  roomName);
-//            synchronized (this.chatRooms){
-//                this.chatRooms.remove(roomName); // remove room
-//            }
-//            synchronized (this.roomOwnership){
-//                this.roomOwnership.remove(roomName); // remove the ownership since the room is removed
-//            }
-//        }
 
     }
 
@@ -149,7 +132,11 @@ public class ChatManager {
         synchronized (clients){
             for (ServerConnection s: clients){
                 if (ignore == null || !s.equals(ignore)){
-                    s.sendMessage(message);
+                    try{
+                        s.sendMessage(message);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -158,13 +145,20 @@ public class ChatManager {
 
     public void broadCastToCurrentRoom(ServerConnection s, String message ,ServerConnection ignore){
         String roomName = s.getCurrentChatRoom();
-//        LOGGER.info("Broadcast msg to " + roomName);
-        broadCastAGroup(this.chatRooms.get(roomName), message,ignore);
+        LOGGER.info("Broadcast msg to " + roomName);
+        ArrayList<ServerConnection> sc = this.chatRooms.get(roomName);
+        if (sc != null){
+            broadCastAGroup(sc, message,ignore);
+        }
     }
 
     public void sendToOneClient(String message, ServerConnection serverConnection){
 //        LOGGER.info("Send msg to " +  serverConnection.getName());
-        serverConnection.sendMessage(message);
+        try{
+            serverConnection.sendMessage(message);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public synchronized boolean isUniqueIdentity(String identity){
@@ -184,8 +178,10 @@ public class ChatManager {
         System.out.println("Client " +  s.getName() + " leave the room " + roomid);
         String currentRoom = s.getCurrentChatRoom();
         ArrayList<ServerConnection> currentRoomClientList = this.chatRooms.get(currentRoom);
-        currentRoomClientList.remove(s);
-        s.setCurrentChatRoom("");
+        if (currentRoomClientList != null){
+            currentRoomClientList.remove(s);
+            s.setCurrentChatRoom("");
+        }
     }
 
     public synchronized boolean joinRoom (ServerConnection s, String roomid){
@@ -246,6 +242,7 @@ public class ChatManager {
 
         return roomsInfo;
     }
+
 
     public synchronized boolean createRoom(ServerConnection s, String roomid){
 

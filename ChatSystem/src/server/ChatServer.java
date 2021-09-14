@@ -23,7 +23,6 @@ public class ChatServer {
     private final Gson gson = new Gson();
     private static final ChatManager chatManager = new ChatManager();
     private static final CommandFactory commandFactory = new CommandFactory();
-    private static final TCPConnectionCheck tcpConnectionCheck = new TCPConnectionCheck(chatManager);
     private boolean alive;
     public static final Logger LOGGER = Logger.getLogger(ChatServer.class.getName());
 
@@ -89,7 +88,6 @@ public class ChatServer {
     public void handle() {
         try {
             ServerSocket serverSocket = new ServerSocket(port);
-            tcpConnectionCheck.start();
             alive = true;
 
             while (alive){
@@ -109,7 +107,6 @@ public class ChatServer {
             }
         } catch (IOException e) {
             alive = false;
-            tcpConnectionCheck.setTcpCheckFlag(false);
             e.printStackTrace();
         }
     }

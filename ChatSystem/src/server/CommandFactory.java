@@ -24,13 +24,9 @@ public class CommandFactory {
      */
     public ServerCommand convertClientMessageToCommand(String jsonMessage){
         String type = this.gson.fromJson(jsonMessage, JsonObject.class).get("type").getAsString();
-        if (!type.equals("ack")){
-            System.out.println("Received: " + jsonMessage);
-        }
+        System.out.println("Received: " + jsonMessage);
 
         switch(type){
-            case "ack":
-                return this.generateCommand(jsonMessage, ReceiveAckCommand.class);
             case "identitychange":
                 return this.generateCommand(jsonMessage, IdentityChangeCommand.class);
             case "message":

@@ -59,7 +59,7 @@ public class RoomListCommand extends ClientCommand{
                 print.append(r.getRoomid()).append(": ").append(noOfGuests).append(noOfGuests >1? " guests\n": " guest\n");
             }
             String printStr = print.toString().stripTrailing();
-            System.out.println( printStr);
+            System.out.println(printStr);
         }
 
         if (chatClient.isBundleMsg()){

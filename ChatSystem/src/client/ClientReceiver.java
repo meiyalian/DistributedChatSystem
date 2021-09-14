@@ -1,10 +1,7 @@
 package client;
 
-import client_command.AskAckCommand;
 import client_command.ClientCommand;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import client_command.RoomChangeCommand;
 
 import java.io.BufferedReader;
@@ -20,10 +17,8 @@ public class ClientReceiver extends Thread{
     private BufferedReader reader;
     private boolean connection_alive;
     private PrintWriter writer;
-    private Gson gson;
 
     public ClientReceiver(ChatClient chatClient) throws IOException {
-        this.gson = new Gson();
         this.connection_alive = true;
         this.chatClient = chatClient;
         this.socket = chatClient.getSocket();
@@ -49,12 +44,8 @@ public class ClientReceiver extends Thread{
         while (connection_alive) {
             try {
                 String str = reader.readLine();
-                String type = gson.fromJson(str, JsonObject.class).get("type").getAsString();
-                if (type.equals("ack")){
-                    AskAckCommand askAckCommand = gson.fromJson(str, AskAckCommand.class);
-                    String returnCommand = askAckCommand.executeAckCommand(chatClient);
-                    this.writer.println(returnCommand);
-                } else if (str != null){
+
+                if (str != null){
                     ClientCommand command = commandFactory.convertServerMessageToCommand(str);
 //                    System.out.println("receive: " + str);
                     if (command != null){

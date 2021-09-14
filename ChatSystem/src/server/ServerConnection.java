@@ -1,5 +1,6 @@
 package server;
 
+import server_command.QuitCommand;
 import server_command.ServerCommand;
 
 import java.io.BufferedReader;
@@ -53,13 +54,26 @@ public class ServerConnection extends Thread {
         connection_alive = true;
         while (connection_alive) {
             try {
-                String jsonMessage = this.reader.readLine();
-                if (jsonMessage != null){
+                if (chatManager.isClientInConnectionList(this)){
+                    String jsonMessage = this.reader.readLine();
+                    if (jsonMessage != null){
 //                    System.out.println("receive: " + jsonMessage);
-                    executeCommand(jsonMessage);
+                        executeCommand(jsonMessage);
+                    } else if (jsonMessage == null) {
+                        /** if client disconnects, reader.readLine() returns null */
+                        QuitCommand quitCommand = new QuitCommand();
+                        quitCommand.execute(this);
+                    }
+                }else {
+                    Thread.sleep(1000);
                 }
-            } catch (IOException e){
+
+            } catch (Exception e){
+                /** handles the case when clients do not gracefully shut down the connection */
                 connection_alive = false;
+                QuitCommand quitCommand = new QuitCommand();
+                quitCommand.execute(this);
+                e.printStackTrace();
             }
         }
         close();
@@ -78,7 +92,7 @@ public class ServerConnection extends Thread {
         }
     }
 
-    public void sendMessage(String message) {
+    public void sendMessage(String message) throws IOException {
         this.writer.println(message);
         this.writer.flush();
     }
