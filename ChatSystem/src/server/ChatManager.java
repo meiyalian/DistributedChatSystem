@@ -195,7 +195,6 @@ public class ChatManager {
                 currentRoomClientList.remove(s);
             }
             newRoom.add(s);
-            s.setCurrentChatRoom(roomid);
             return true;
         }
         return false;
