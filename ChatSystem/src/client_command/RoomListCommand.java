@@ -15,7 +15,6 @@ public class RoomListCommand extends ClientCommand{
     public RoomListCommand(HashMap<String, Integer> info) {
         for (Map.Entry<String, Integer> entry : info.entrySet()){
             this.rooms.add(new RoomInfo(entry.getKey(), entry.getValue()));
-            System.out.println();
         }
     }
 
@@ -60,7 +59,7 @@ public class RoomListCommand extends ClientCommand{
                 print.append(r.getRoomid()).append(": ").append(noOfGuests).append(noOfGuests >1? " guests\n": " guest\n");
             }
             String printStr = print.toString().stripTrailing();
-            System.out.println( printStr);
+            System.out.println(printStr);
         }
 
         if (chatClient.isBundleMsg()){
@@ -87,9 +86,5 @@ public class RoomListCommand extends ClientCommand{
             return count;
         }
     }
-
-
-
-
 
 }

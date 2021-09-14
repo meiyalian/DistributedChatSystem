@@ -21,6 +21,7 @@ class ClientSender extends Thread{
     public ClientSender(Socket soc, ChatClient chatClient) throws IOException {
         // Client must know the hostname or IP of teh machine and on which the server is running
         this.socket = soc;
+        this.connection_alive = true;
         this.gson = new Gson();
         this.chatClient = chatClient;
         this.commandFactory = new CommandFactory(this.chatClient);
@@ -30,26 +31,36 @@ class ClientSender extends Thread{
         this.writer = new PrintWriter(this.socket.getOutputStream(), true);
     }
 
+    public void setConnection_alive(boolean connection_alive) {
+        this.connection_alive = connection_alive;
+    }
+
     public void close() throws IOException {
+        this.connection_alive = false;
         this.userInput.close();
-        this.writer.close();
-        this.socket.close();
     }
 
     /**
      * Send message to server
      */
     public void run() {
-        connection_alive = true;
         while (connection_alive) {
             try {
                 String str = userInput.readLine();
                 if (str != null){
                     ServerCommand command = commandFactory.convertUserInputToCommand(str);
-                    String jsonMessage = gson.toJson(command);
-                    // convert user input to command and convert command to json object
-                    // then send this json command object to server
-                    this.writer.println(jsonMessage);
+                    if (command != null){
+                        String jsonMessage = gson.toJson(command);
+                        // convert user input to command and convert command to json object
+                        // then send this json command object to server
+                        this.writer.println(jsonMessage);
+
+                        if (str.equals("#quit")){
+                            connection_alive = false;
+                        }
+                    } else {
+                        chatClient.printPrefix();
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -58,7 +69,7 @@ class ClientSender extends Thread{
         }
 
         try {
-            close();
+            this.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

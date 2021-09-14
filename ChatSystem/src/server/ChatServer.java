@@ -13,6 +13,7 @@ import client_command.NewIdentityCommand;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 public class ChatServer {
@@ -46,7 +47,6 @@ public class ChatServer {
             }
         } catch (ParseException e){
             e.printStackTrace();
-            System.out.println("Default port " + DEFAULT_PORT + " will be used.");
             port = DEFAULT_PORT;
         }
 
@@ -65,9 +65,23 @@ public class ChatServer {
         return gson.toJson(newIdentityCommand);
     }
 
+    private synchronized boolean isIdentityInList(String identity){
+        ArrayList<ServerConnection> serverConnections = chatManager.getClientConnectionList();
+        for (ServerConnection serverConnection: serverConnections){
+            if (identity.equals(serverConnection.getName())){
+                return true;
+            }
+        }
+        return false;
+    }
+
     private synchronized String autoGenerateIdentity(){
         String identity = "guest" + identityCount;
         identityCount += 1;
+        while (isIdentityInList(identity)){
+            identity = "guest" + identityCount;
+            identityCount += 1;
+        }
         return identity;
     }
 
@@ -81,11 +95,13 @@ public class ChatServer {
                 if (soc != null){
                     LOGGER.info("New connection received: " + soc.getRemoteSocketAddress().toString());
                     ServerConnection serverConnection = new ServerConnection(soc, chatManager, commandFactory);
+                    chatManager.addClientToConnectionList(serverConnection);
 
                     //send first msg to client
                     String jsonMessage = generateIdentityForNewClient(serverConnection);
                     chatManager.addClientConnection(serverConnection, jsonMessage);
                     serverConnection.start(); // start thread
+
                 }
 
             }

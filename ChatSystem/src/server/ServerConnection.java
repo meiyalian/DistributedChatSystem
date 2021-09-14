@@ -1,5 +1,6 @@
 package server;
 
+import server_command.QuitCommand;
 import server_command.ServerCommand;
 
 import java.io.BufferedReader;
@@ -27,6 +28,10 @@ public class ServerConnection extends Thread {
         setCurrentChatRoom("");
     }
 
+    public Socket getSocket(){
+        return this.socket;
+    }
+
     public void setCurrentChatRoom(String currentChatRoom) {
         this.currentChatRoom = currentChatRoom;
     }
@@ -37,10 +42,11 @@ public class ServerConnection extends Thread {
 
     public ChatManager getChatManager(){return this.chatManager;}
 
-    private void executeCommand(String jsonMessage){
-
+    private void executeCommand(String jsonMessage) throws IOException {
         ServerCommand command = commandFactory.convertClientMessageToCommand(jsonMessage);
-        command.execute(this);
+        if (command != null){
+            command.execute(this);
+        }
     }
 
     @Override
@@ -48,19 +54,31 @@ public class ServerConnection extends Thread {
         connection_alive = true;
         while (connection_alive) {
             try {
-                String jsonMessage = this.reader.readLine();
-                if (jsonMessage != null){
-                    System.out.println("receive: " + jsonMessage);
-                    executeCommand(jsonMessage);
+                if (chatManager.isClientInConnectionList(this)){
+                    String jsonMessage = this.reader.readLine();
+                    if (jsonMessage != null){
+//                    System.out.println("receive: " + jsonMessage);
+                        executeCommand(jsonMessage);
+                    } else if (jsonMessage == null) {
+                        /** if client disconnects, reader.readLine() returns null */
+                        QuitCommand quitCommand = new QuitCommand();
+                        quitCommand.execute(this);
+                    }
+                }else {
+                    Thread.sleep(1000);
                 }
-            } catch (IOException e){
+
+            } catch (Exception e){
+                /** handles the case when clients do not gracefully shut down the connection */
                 connection_alive = false;
+                QuitCommand quitCommand = new QuitCommand();
+                quitCommand.execute(this);
+                e.printStackTrace();
             }
         }
         close();
     }
 
-    //Todo: leave chatroom
     private void leave(ServerConnection connection) {
         chatManager.removeClientConnection(connection);
     }
@@ -74,7 +92,7 @@ public class ServerConnection extends Thread {
         }
     }
 
-    public void sendMessage(String message) {
+    public void sendMessage(String message) throws IOException {
         this.writer.println(message);
         this.writer.flush();
     }
