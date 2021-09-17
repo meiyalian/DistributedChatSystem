@@ -19,22 +19,14 @@ public class NewIdentityCommand extends ClientCommand {
 
     @Override
     public void execute(ChatClient chatClient) {
-
         boolean firstTimeConnection = former.equals("");
         String str;
 
         if (firstTimeConnection){
             chatClient.setIdentity(identity);
             str = "Connected to localhost as " + identity;
-        } else if (former.equals(identity)) {
-            str = "Requested identity invalid or in use";
-        } else if (former.equals(chatClient.getIdentity())) {
-            // if former is equal to chatClient identity, this means that this client has changed the identity
-            chatClient.setIdentity(identity);
-            str = former + " is now " + identity;
         } else {
-            // if former is not equal to chatClient identity, this means that another client has changed the identity
-            str = former + " is now " + identity;
+            str = performIdentityChange(chatClient);
         }
 
         System.out.println(str);
@@ -43,4 +35,16 @@ public class NewIdentityCommand extends ClientCommand {
             chatClient.printPrefix();
         }
     }
+
+    private String performIdentityChange(ChatClient chatClient){
+
+        if (former.equals(identity)) {
+            return "Requested identity invalid or in use";
+        } else if (former.equals(chatClient.getIdentity())) {
+            // if former is equal to chatClient identity, this means that this client has changed the identity
+            chatClient.setIdentity(identity);
+        }
+        return former + " is now " + identity;
+    }
+
 }

@@ -8,7 +8,6 @@ import org.apache.commons.cli.Options;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.ArrayList;
 
 public class ChatClient {
     private final Socket socket;
@@ -46,6 +45,13 @@ public class ChatClient {
         return identity;
     }
 
+
+    /**
+     * Valid command line input:
+     * java -jar chatclient.jar ip_address -p port
+     * localhost is used without specifying ip_address
+     * -p port is optional
+     * */
     public static void main(String[] args){
         int port;
         String hostname;
@@ -110,6 +116,9 @@ public class ChatClient {
 
         } catch (InterruptedException e){
             System.out.println("Connection is interrupted");
+            /** clientReceiver is a thread responsible for receiving message
+             * clientSender is a thread responsible for sending message
+             * */
             clientReceiver.close();
             clientSender.close();
         } finally {

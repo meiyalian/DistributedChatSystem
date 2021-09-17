@@ -30,6 +30,11 @@ public class ChatServer {
         this.port = port;
     }
 
+    /**
+     * Valid command line input:
+     * java -jar chatserver.jar -p port
+     * -p port is optional
+     * */
     public static void main(String[] args) {
         int port;
         CommandLineParser parser = new BasicParser();

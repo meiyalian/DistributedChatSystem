@@ -49,7 +49,6 @@ public class ClientReceiver extends Thread{
                     this.connection_alive = false;
                 } else {
                     ClientCommand command = commandFactory.convertServerMessageToCommand(str);
-//                    System.out.println("receive: " + str);
                     if (command != null){
                         if (command instanceof RoomChangeCommand && ((RoomChangeCommand) command).getRoomid().equals("MainHall")){
                             chatClient.setBundleMsg(true);
